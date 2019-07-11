@@ -10,7 +10,7 @@ Co-trainers: UC Berkeley Statistics, D-Lab, and the Statewide Database at Berkel
 
 ### Overview
 
-This is the website for the sixth annual R bootcamp at Berkeley. The bootcamp will be an intensive two-day introduction to R using RStudio. Topics will include:
+This is the website for the seventh annual R bootcamp at Berkeley. The bootcamp will be an intensive two-day introduction to R using RStudio. Topics will include:
 
  * R basics - reading and manipulating data, working with R data objects, doing calculations, making plots
  * programming in R
