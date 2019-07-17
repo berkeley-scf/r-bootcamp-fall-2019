@@ -1,0 +1,640 @@
+% R bootcamp, Module 10: Advanced topics
+% August 2019, UC Berkeley
+% Chris Paciorek
+
+```{r chunksetup, include=FALSE} 
+# include any code here you don't want to show up in the document,
+# e.g. package and dataset loading
+if(!('modules' %in% unlist(strsplit(getwd(), split = '/')))) setwd('modules')
+gap <- read.csv(file.path('..', 'data', 'gapminder-FiveYearData.csv'), stringsAsFactors = FALSE)
+air <- read.csv(file.path('..', 'data', 'airline.csv'), stringsAsFactors = FALSE)
+```
+
+# This purpose of this module
+
+For some of the topics here, my goal is not to teach you how to fish, but merely to tell you that fish exist, they are delicious, that they can be caught, and where one might go to figure out how to catch them.
+
+# Object-oriented programming (OOP) in R
+
+
+Confusingly, R has three (well, four) different systems for OOP, and none of them are as elegant and powerful as in Python or other languages more focused on OOP. That said, they get the job done for a lot of tasks.
+
+* S3: informal system used for `lm()`, `glm()`, and many other core features in R in the *stats* package
+* S4: more formal system, used with *lme4* 
+* R6 (and Reference Classes): new systems allowing for passing objects by reference, with R6 similar to OOP in other languages
+
+# Basics of object-oriented programming (OOP)
+
+The basic idea is that coding is structured around *objects*, which belong to a *class*, and *methods* that operate on objects in the class.
+
+Objects are like lists, but with methods that are specifically associated with particular classes, as we've seen with the `lm` class.
+
+Objects have fields, analogous to the components of a list. For S4 and reference classes, the fields of the class are fixed and all objects of the class must contain those fields. 
+
+# Working with S3 classes and methods
+
+R has several approaches to object-oriented programming.  These are widely used, albeit a bit klunky. 
+
+The most basic is 'S3' objects. These objects are generally built upon lists.
+
+```{r}
+mod <- lm(gap$lifeExp ~ log(gap$gdpPercap))
+class(mod)
+is.list(mod)
+names(mod)
+mod$coefficients
+mod[['coefficients']]
+mod[[1]]
+```
+
+The magic of OOP here is that methods (i.e., functions) can be tailored to work specifically with specific kinds of objects.
+
+```{r}
+summary(gap$lifeExp)
+summary(mod)
+```
+
+**Question**: What do you think R is doing behind the scenes?
+
+Consider `summary.lm`.
+
+# More on working with S3 classes and methods 
+
+```{r}
+library(methods)
+yb <- gap$lifeExp > 75
+yc <- gap$lifeExp
+x <- log(gap$gdpPercap)
+mod1 <- lm(yc ~ x)
+mod2 <- glm(yb ~ x, family = binomial)
+mod2$residuals[1:20] # access field with list-like syntax
+
+class(mod2)
+is(mod2, "lm")
+is.list(mod2)
+names(mod2)
+
+methods(class = "glm")
+
+methods(predict)
+
+predict
+
+# predict.glm
+```
+
+When `predict()` is called on a GLM object, it first calls the generic `predict()`, which then recognizes that the first argument is of the class *glm* and immediately calls the right class-specific method, `predict.glm()` in this case.
+
+# Making your own S3 class/object/method
+
+Making an object and class-specific methods under S3 is simple. 
+
+```{r}
+rboot2018 <- list(month = 'August', year = 2015, 
+  instructor = 'Paciorek', attendance = 100)
+class(rboot2018) <- "workshop"
+
+rboot2018
+is(rboot2018, "workshop")
+rboot2018$instructor 
+
+print.workshop <- function(x) {
+    with(x,
+       cat("A workshop held in ", month, " ", year, "; taught by ", instructor, ".\nThe attendance was ", attendance, ".\n", sep = ""))
+    invisible(x)
+}
+
+# doesn't execute correctly in the slide creation, so comment out here:
+# rboot2018 
+```
+ 
+Note that we rely on the generic `print()` already existing in R. Otherwise we'd need to create it.
+
+So what is happening behind the scenes here?
+
+# Using S4 classes and methods
+
+Unlike S4, S4 classes have a formal definition and objects in the class must have the specified fields. 
+
+The fields of an S4 class are called 'slots'. Instead of `x$field` you do `x@field`.
+
+Here's a bit of an example of an S4 class for a linear mixed effects model from *lme4*:
+
+```{r}
+library(lme4)
+library(methods)
+fm1 <- lmer(Reaction ~ Days + (Days|Subject), sleepstudy)
+class(fm1)
+methods(class = "lmerMod")
+slotNames(fm1)
+fm1$theta
+fm1@theta
+```
+
+# A brief mention of R6 Classes
+
+R6 classes are a somewhat new feature in R that provides object oriented programming with behavior more like in other languages.
+
+Here's an extended example that simulates random time series. 
+
+```{r}
+tsSimClass <- R6Class("tsSimClass",
+    ## class for holding time series simulators
+    public = list(
+        initialize = function(times, mean = 0, corParam = 1){
+            library(fields)
+            stopifnot(is.numeric(corParam), length(corParam) == 1)
+            stopifnot(is.numeric(times))
+            private$times <- times
+            private$n <- length(times)
+            private$mean <- mean
+            private$corParam <- corParam
+            private$currentU <- FALSE
+            private$calcMats()
+        },
+        
+        changeTimes = function(newTimes){
+            # modifies a private member field (i.e., a 'setter') and recalculates
+            private$times <- newTimes
+            private$calcMats()
+        },
+        
+        getTimes = function(){
+            # a 'getter'
+            return(private$times)
+        },
+
+        print = function(){ # 'print' method
+            cat("R6 Object of class 'tsSimClass' with ",
+                private$n, " time points.\n", sep = '')
+            invisible(self)
+        }
+    ),
+
+    ## private methods and functions not accessible externally
+    private = list(
+        calcMats = function() {
+            ## calculates correlation matrix and Cholesky factor
+            lagMat <- fields::rdist(private$times) # local variable
+            corMat <- exp(-lagMat^2 / private$corParam^2)
+            private$U <- chol(corMat) # square root matrix
+            cat("Done updating correlation matrix and Cholesky factor.\n")
+            private$currentU <- TRUE
+            invisible(self)
+        },
+        # internal (private) fields not directly accessible from outside the object
+        n = NULL, 
+        times = NULL,
+        mean = NULL,
+        corParam = NULL,
+        U = NULL,
+        currentU = FALSE
+    )
+)   
+
+## add another method after class is already created
+tsSimClass$set("public", "simulate", function() {
+    if(!private$currentU)
+        private$calcMats()
+    ## analogous to mu+sigma*z for generating N(mu, sigma^2)
+    return(private$mean + crossprod(private$U, rnorm(private$n)))
+})
+
+## @knitr R6use, fig.width=7
+master <- tsSimClass$new(1:100, 2, 1)
+master
+set.seed(1)
+devs <- master$simulate()   # generate a time series
+plot(master$getTimes(), devs, type = 'l', xlab = 'time',
+      ylab = 'process values')
+master <- tsSimClass$new(1:100, 2, 3)
+set.seed(1)
+devs <- master$simulate()   # generate a second time series
+lines(master$getTimes(), devs, col = 'red')
+```
+
+
+# Error and warning messages
+
+When you write your own functions, and particularly for distributing to others, it's a good idea to:
+
+* Check for possible errors (particularly in the input arguments) and give the user an informative error message
+* Warn them if you're doing something they might not have anticipated
+
+We can use `stop()` and `warning()` to do this. They're the same functions that are being called when you see an error message or a warning in reaction to your own work in R.
+
+```{r}
+mysqrt <- function(x) {
+  if(is.list(x)) {
+    warning("x is a list; converting to a vector")
+    x <- unlist(x)
+  }
+  if(!is.numeric(x)) {
+    stop("What is the square root of 'bob'?")
+  } else {
+      if(any(x < 0)) {
+        warning("mysqrt: found negative values; proceeding anyway")
+        x[x >= 0] <- (x[x >= 0])^(1/2)
+        x[x < 0] <- NaN
+        return(x)
+      } else return(x^(1/2))
+  }
+}
+
+mysqrt(c(1, 2, 3))
+mysqrt(c(5, -7))
+mysqrt(c('asdf', 'sdf'))
+mysqrt(list(5, 3, 'ab'))
+sqrt(c(5, -7))
+sqrt('asdf')
+sqrt(list(5, 3, 2))
+```
+
+So we've done something similar to what `sqrt()` actually does in R.
+
+# 'Catching' errors
+
+When you automate analyses, sometimes an R function call will fail. But you don't want all of your analyses to grind to a halt because one failed. Rather, you want to catch the error, record that it failed, and move on.
+
+For me this is most critical when I'm doing stratified analyses or sequential operations.
+
+The `try()` function is a powerful tool here.
+
+# Why we need to `try()`
+
+Suppose we tried to do a stratified analysis of life expectancy on GDP within continents, for 2007. I'm going to do this as a for loop for pedagogical reasons, but again, it would be better to do this with dplyr/lapply/by type tools.
+
+For the purpose of illustration, I'm going to monkey a bit with the data such that there is an error in fitting Oceania. This is artificial, but when you stratify data into smaller groups it's not uncommon that the analysis can fail for one of the groups (often because of small sample size or missing data).
+
+
+```{r}
+mod <- list()
+fakedat <- gap[gap$year == 2007, ]
+fakedat$gdpPercap[fakedat$continent == 'Oceania'] <- NA
+
+for(cont in c('Asia', 'Oceania', 'Europe', 'Americas', 'Africa')) {
+            cat("Fitting model for continent ", cont, ".\n")
+            tmp <- subset(fakedat, continent == cont)
+            mod[[cont]] <- lm(lifeExp ~ log(gdpPercap), data = tmp)
+}
+```
+
+What happened?
+
+
+# How we can `try()` harder
+
+```{r}
+mod <- list()
+
+for(cont in c('Asia', 'Oceania', 'Europe', 'Americas', 'Africa')) {
+            cat("Fitting model for continent ", cont, ".\n")
+            tmp <- subset(fakedat, continent == cont)
+            curMod <- try(lm(lifeExp ~ log(gdpPercap), data = tmp))
+            if(is(curMod, "try-error")) mod[[cont]] <- NA 
+                       else mod[[cont]] <- curMod            
+}
+
+mod[[1]]
+mod[[2]]
+```
+
+# Computing on the language
+
+One of the powerful capabilities you have in R is the ability to use R to modify and create R code. 
+
+First we need to understand a bit about how R code is stored and manipulated when we don't want to immediately evaluate it.
+
+When you send some code to R to execute, it has to 'parse' the input; i.e., to process it so that it know how to evaluate it. The parsed input can then be evaluated in the proper context (i.e., the right frame, holding the objects to be operated on and created). 
+
+We can capture parsed code before it is evaluated, manipulate it, and execute the modified result.
+
+# Capturing and evaluating parsed code
+
+```{r}
+code <- quote(n <- 100)
+code
+class(code)
+n
+
+eval(code)
+n
+
+results <- rep(0, n)
+moreCode <- quote(for(i in 1:n) {
+    tmp <- rnorm(30)
+    results[i] <- min(tmp)
+})
+class(moreCode)
+as.list(moreCode)
+
+newN <- 200
+codeText <- paste("n", "<-", newN)
+codeText
+codeFromText <- parse(text = codeText)
+codeFromText
+eval(codeFromText)
+n
+```
+
+So you could use R's string manipulation capabilities to write and then evaluate R code. Meta.
+
+# Using R to automate working with object names 
+
+Suppose you were given a bunch of objects named "x1", "x2", "x3", ... and you wanted to write code to automatically do some computation on them. Here I'll just demonstrate with three, but this is obviously more compelling if there are many of them.
+
+```{r}
+# assume these objects were provided to you
+x1 <- rnorm(5)
+x2 <- rgamma(10, 1)
+x3 <- runif(20)
+# now you want to work with them
+nVals <- 3
+results <- rep(0, nVals)
+for(i in 1:nVals) { 
+  varName <- paste("x", i, sep = "")
+  tmp <- eval(as.name(varName))
+  # tmp <- get(varName) # an alternative
+   results[i] <- mean(tmp)
+}
+results
+varName
+tmp
+```
+
+Or suppose you needed to create "x1", "x2", "x3", automatically.
+
+```{r}
+nVals <- 3
+results <- rep(0, nVals)
+for(i in 1:nVals) {  
+   varName <- paste("x", i, sep = "")
+   assign(varName, rnorm(10))
+}
+x2
+```
+
+Can you think of any uses of this ability for R to self-generate?
+
+# File encodings
+
+Text (either in the form of a file with regular language in it or a data file with fields of character strings) will often contain characters that are not part of the [limited ASCII set of characters](http://en.wikipedia.org/wiki/ASCII), which has 128 characters and control codes; basically what you see on a standard US keyboard.
+
+UTF-8 is an encoding for the Unicode characters that include more than 110,000 characters from 100 different alphabets/scripts. It's widely used on the web.
+
+Latin-1 encodes a small subset of Unicode and contains the characters used in many European languages (e.g., letters with accents).
+
+# Dealing with encodings in R
+
+To read files with other characters correctly into R, you may need to tell R what encoding the file is in. E.g., see help on `read.table()` for the *fileEncoding* and *encoding* arguments. 
+
+With strings already in R, you can convert between encodings with `iconv()`:
+```{r}
+text <- "Melhore sua seguran\xe7a"
+iconv(text, from = "latin1", to = "UTF-8")
+iconv(text, from = "latin1", to = "ASCII", sub = "???")
+```
+
+You can mark a string with an encoding so R can display it correctly:
+```{r}
+x <- "fa\xE7ile"
+Encoding(x) <- "latin1"
+x
+
+# playing around...
+x <- "\xa1 \xa2 \xa3 \xf1 \xf2"
+Encoding(x) <- "latin1"
+x
+```
+
+# Line endings in text files
+
+Windows, Mac, and Linux handle line endings in text files somewhat differently. So if you read a text file into R that was created in a different operating system you can run into difficulties.
+
+* In Windows lines end in both a newline (the ASCII character `\n`) and a carriage return (`\r`). 
+* In UNIX and Mac OS X, lines end in only a newline.
+
+
+So in UNIX you might see `^M` at the end of lines when you open a Windows file in a text editor. The *dos2unix* or *fromdos* in UNIX commands can do the necessary conversion
+
+In Windows you might have a UNIX text file appear to be all one line. The *unix2dos* or *todos* commands in UNIX can do the conversion. 
+
+There may also be Windows tools to deal with this. 
+
+As a side note, before Mac OS X, lines ended only in a carriage return.
+There is a UNIX utility call *mac2unix* that can convert such text files.
+
+# Working with databases
+
+R has the capability to read and write from a variety of relational database management systems (DBMS). Basically a database is a collection of rectangular format datasets (tables). Some of these tables have fields in common so it makes sense to merge (i.e., join) information from multiple tables. E.g., you might have a database with a table of student information, a table of teacher information and a table of school information. 
+
+The *DBI* package provides a front-end for manipulating databases from a variety of DBMS (MySQL, SQLite, Oracle, among others)
+
+Basically, you tell the package what DBMS is being used on the back-end, link to the actual database, and then you can use the standard functions in the package regardless of the back-end. 
+
+# Database example
+
+You can get an example database of information about Stack Overflow questions and answers from [http://www.stat.berkeley.edu/share/paciorek/stackoverflow-2016.db](http://www.stat.berkeley.edu/share/paciorek/stackoverflow-2016.db). Stack Overflow is a website where programmers and software users can pose questions and get answers to technical problems.
+
+
+```{r}
+library(RSQLite)  # DBI is a dependency
+db <- dbConnect(SQLite(), dbname = "../data/stackoverflow-2016.db") 
+## stackoverflow-2016.db is an SQLite database
+
+## metadata
+dbListTables(db)
+dbListFields(db, "questions")
+
+## simple filter operation
+popular <- dbGetQuery(db, "select * from questions 
+   where viewcount > 10000")
+## a join followed by a filter operation
+popularR <- dbGetQuery(db, "select * from questions join questions_tags
+   on questions.questionid = questions_tags.questionid
+   where viewcount > 10000 and
+   tag = 'r'")
+```
+
+# Computer architecture
+
+Note to participants: I'm having trouble with parallelization in RStudio, so we'll just run the demo code in this module in a command line R session. You can open the basic R GUI for Mac or Windows, or, on a Mac, start R in a terminal window.
+
+* Modern computers have multiple processors and clusters/supercomputers have multiple networked machines, each with multiple processors.
+* The key to increasing computational efficiency in these contexts is breaking up the work amongst the processors.
+* Processors on a single machine (or 'node') share memory and don't need to carry out explicit communication (shared memory computation)
+* Processors on separate machines need to pass data across a network, often using the MPI protocol (distributed memory computation)
+
+We'll focus on shared memory computation here.
+
+# How do I know how many cores a computer has?
+
+* Linux - count the processors listed in */proc/cpuinfo* or use `nproc`
+* Mac - in a terminal: `system_profiler | grep -i 'Cores'`
+* Windows - count the number of graphs shown for CPU Usage (or CPU Usage History) under "Task Manager->Performance", or [try this program](http://www.cpuid.com/cpuz.php) 
+ 
+To see if multiple cores are being used by your job, you can do:
+
+* Mac/Linux - use *top* or *ps*
+* Windows - see the "Task Manager->Performance->CPU Usage"
+
+# How can we make use of multiple cores?
+
+Some basic approaches are:
+
+* Use a linear algebra package that distributes computations across 'threads'
+* Spread independent calculations (embarrassingly parallel problems) across multiple cores
+    - *for* loops with independent calculations
+    - parallelizing `apply()` and its variants
+
+
+# Threaded linear algebra
+
+R comes with a default BLAS (basic linear algebra subroutines) and LAPACK (linear algebra package) that carry out the core linear algebra computations. However, you can generally improve performance (sometimes by an order of magnitude) by using a different BLAS. Furthermore a threaded BLAS will allow you to use multiple cores.
+
+A 'thread' is a lightweight process, and the operating system sees multiple threads as part of a single process.
+
+* For Linux, *openBLAS*, Intel's *MKL* and AMD's *ACML* are both fast and threaded. On the SCF we have openBLAS on the compute servers and ACML on the Linux cluster and R uses these for linear algebra.
+* For Mac, Apple's *vecLib* (in a library called *libRblas.vecLib.dylib*) is fast and threaded.
+* For Windows, you're probably out of luck.
+
+We'll show by demonstration that my Mac laptop is using multiple cores for linear algebra operations.
+
+```{r, cache=TRUE}
+# note to CJP: don't run in RStudio
+n <- 5000
+x <- matrix(rnorm(n^2), n)
+U <- chol(crossprod(x))
+```
+
+You should see that your R process is using more than 100% of CPU. Inconceivable!
+
+# More details on the BLAS
+
+You can talk with your systems administrator about linking R to a fast BLAS or you can look into it yourself for your personal machine; see the [R Installation and Administration manual](http://www.cran.r-project.org/manuals.html).
+
+Note that in some cases, in particular for small matrix operations, using multiple threads may actually slow down computation, so you may want to experiment, particularly with Linux. You can force the linear algebra to use only a single core by doing (assuming you're using the bash shell) `export OMP_NUM_THREADS=1` in the terminal window *before* starting R in the same terminal. Or see the *RhpcBLASctl* package to do it from within R.
+ 
+Finally, note that threaded BLAS and either `foreach` or parallel versions of `apply()` can conflict and cause R to hang, so you're likely to want to set the number of threads to 1 as above if you're doing explicit parallelization. 
+
+# What is an embarrassingly parallel (EP) problem?
+
+Do you think you should be asking? 
+
+An EP problem is one that can be solved by doing independent computations as separate processes without communication between the processes. You can get the answer by doing separate tasks and then collecting the results. 
+
+Examples in statistics include
+
+1. stratified analyses
+2. cross-validation
+4. simulations with many independent replicates
+5. bootstrapping
+3. random forests models
+
+Can you think of others in your work?
+
+Some things that are not EP (at least not in a basic formulation):
+
+1. Markov chain Monte Carlo for fitting Bayesian models
+2. optimization
+
+# Using multiple cores for EP problems: parallel *apply* using `future`
+
+The `future` package provides a lot of nice features for parallelization. We'll just scratch the surface here to parallelize operations over the elements of a list (note that this is essentially equivalent to `parLapply` and `mclapply`.
+
+First, make sure your computations on the elements are independent of each other and don't involve sequential calculations!
+
+
+```{r}
+fitFun <- function(curDest) {
+            library(mgcv)
+            tmp <- subset(air, Dest == curDest)
+            tmp$Hour <- tmp$CRSDepTime %/% 100
+            curMod <- try(gam(DepDelay ~ Year + s(Month) + s(Hour) + 
+                 as.factor(DayOfWeek), data = tmp))
+            if(is(tmp, "try-error")) curMod <- NA 
+            return(curMod)
+}
+
+
+library(future.apply)
+nCores <- 4
+plan(multisession, workers = nCores)  
+out <- future_lapply(unique(air$Dest), fitFun)
+```
+
+[CHECK IF THIS IS TRUE]
+Note there may be  errors in the HTML output from the code below, but the code should work when running it directly.
+
+Note that the `plan` statement determines how the parallelization is done behind the scenes. As shown here, it will start up workers locally on your computer, but if you have access to a cluster, you can modify the plan to make use of multiple compute nodes in a cluster.
+
+One thing to keep in mind is whether the different tasks all take about the same amount of time or widely different times. In the latter case, one wants to sequentially dispatch tasks as earlier tasks finish, rather than dispatching a block of tasks to each core. See  the `future.scheduling` argument for user control over how the allocation is done. 
+
+# Using multiple cores for EP problems: *foreach*
+
+First, make sure your iterations are independent and don't involve sequential calculations!
+
+The *foreach* package provides a way to do a for loop using multiple cores. It can use a variety of 'back-ends' that handle the nitty-gritty of the parallelization. Happily it integrates with the `future` package nicely. 
+
+To use multiple cores on a single machine, use the *parallel* back-end from the *doParallel* package.
+
+We'll use a new dataset here, which is a dataset of airline departure times (in particular delays) for all flights from SFO over a period of several years. We'll do a stratified analysis, fitting a GAM (see Unit 7) for each of the destination airports.
+
+```{r cache=TRUE}
+# note to CJP: don't run in RStudio
+library(parallel)
+library(doFuture)
+library(foreach)
+
+nCores <- 4  # actually only 2 on my laptop, but appears hyperthreaded
+registerDoFuture()
+plan(multisession, workers = nCores)  
+
+out <- foreach(dest = unique(air$Dest)) %dopar% {
+    cat("Starting job for ", dest, ".\n", sep = "")
+    outSub <- fitFun(dest)
+    cat("Finishing job for ", dest, ".\n", sep = "")
+    outSub # this will become part of the out objec
+}
+out[1:5]
+```
+
+**Question**: What do you think are the advantages and disadvantages of having many small tasks vs. a few large tasks?
+
+
+# Parallelization and Random Number Generation
+
+A tale of the good, the bad, and the ugly
+
+Random numbers on a computer are [not truly random](http://dilbert.com/strips/comic/2001-10-25) but are generated as a sequence of pseudo-random numbers. The sequence is finite (but very, very, very, very long) and eventally repeats itself. 
+
+A random number seed determines where in the sequence one starts when generating random numbers.
+
+* The ugly: Make sure you do not use the same seed for each task
+```{r}
+set.seed(1)
+rnorm(5)
+set.seed(1)
+rnorm(5)
+```
+* The (not so) bad: Use a different seed for each task or each process. It's possible the subsequences will overlap but quite unlikely.
+
+* The good: Use the L'Ecuyer algorithm (`library(lecuyer)`) to ensure distinct subsequences
+    - with `foreach` you can use `%dorng%` from the *doRNG* package in place of `%dopar%`
+    - with `mclapply()`, use the `mc.set.seed` argument (see `help(mcparallel)`) 
+
+* The ugly but good: Generate all your random numbers in the master process and distribute them to the tasks if feasible.
+
+The syntax for using L'Ecuyer is available in my [parallel computing tutorial](https://github.com/berkeley-scf/tutorial-parallel-basics).
+
+# A brief note on distributed computing for advanced users
+
+If you have access to multiple machines within a networked environment, such as the compute servers in the Statistics Department or the campus-wide Savio cluster or machines on Amazon's EC2 service, there are a few (sometimes) straightforward ways to parallelize EP jobs across machines.
+
+1. Use `foreach` with *doMPI* as the back-end. You'll need *MPI* and *Rmpi* installed on all machines.
+2. Use `foreach` with *doSNOW* as the backend and start a cluster of type "SOCK" to avoid needing MPI/Rmpi. 
+3. Use sockets to make a cluster in R and then use `parLapply()`, `parSapply()`, `mclapply()`, etc.
+4. Use the *future* package.
+
+See my [tutorial on distributed computing](https://github.com/berkeley-scf/tutorial-parallel-distributed) for syntax and more details. 
+

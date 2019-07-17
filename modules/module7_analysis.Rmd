@@ -1,0 +1,340 @@
+% R bootcamp, Module 7: Analysis
+% August 2019, UC Berkeley
+% Chris Paciorek
+
+```{r chunksetup, include=FALSE} 
+# include any code here you don't want to show up in the document,
+# e.g. package and dataset loading
+library(fields)
+library(foreign)
+if(!('modules' %in% unlist(strsplit(getwd(), split = '/')))) setwd('modules')
+gap <- read.csv(file.path('..', 'data', 'gapminder-FiveYearData.csv'), stringsAsFactors = FALSE)
+gap2007 <- gap[gap$year == 2007, ]
+```
+
+# Describing relationships
+
+- Once we've carried out group-wise operations and perhaps reshaped it, we may also like to describe the relationships in the data. Often this involves fitting some style of regression model.  The goal can be pure prediction, description, or inferring a causal relationship between variables.
+
+Of course to infer causality, one has to be quite careful and techniques that try to avoid the usual pitfall that correlation is not causation are way beyond what we can cover here.
+
+We'll just see the basics of how to fit regressions here. 
+
+# Inference/Regression
+
+- Running regressions in R is generally straightforward.
+
+- Most basic, catch-all regression function in R is *glm*
+
+- *glm* fits a generalized linear model with your choice of family/link function (gaussian, logit, poisson, etc.)
+
+- *lm* is just a standard linear regression (equivalent to glm with family = gaussian(link = "identity"))
+
+- The basic glm call looks something like this:
+
+```{r eval=FALSE}
+glm(formula = y ~ x1 + x2 + x3 + ..., family = familyname(link = "linkname"),
+            data = )
+```
+
+- There are a bunch of families and links to use (help(family) for a full list), but some essentials are **binomial(link = "logit")**, **gaussian(link = "identity")**, and **poisson(link = "log")**
+
+If you're using `lm`, the call looks the same but without the `family` argument. 
+
+- Example: suppose we want to regress the life expectency on the GDP per capita and the population, as well as the continent and year.  The lm/glm call would be something like this:
+
+```{r}
+reg <- lm(formula = lifeExp ~ log(gdpPercap) + log(pop) + continent + year, 
+                data = gap)
+```
+
+# Regression output
+
+- When we store this regression in an object, we get access to several items of interest
+
+```{r}
+# View components contained in the regression output
+names(reg)
+# Examine regression coefficients
+reg$coefficients
+# Examine regression degrees of freedom
+reg$df.residual
+# See the standard (diagnostic) plots for a regression
+plot(reg)
+```
+
+- R has a helpful summary method for regression objects
+```{r}
+summary(reg)
+```
+
+- Can also extract useful things from the summary object
+
+```{r}
+# Store summary method results
+summ_reg <- summary(reg)
+# View summary method results objects
+objects(summ_reg)
+# View table of coefficients
+summ_reg$coefficients
+```
+
+- Note that, in our results, R has broken up our variables into their different factor levels (as it will do whenever your regressors have factor levels)
+
+- If your data aren't factorized, you can tell lm/glm to factorize a variable (i.e. create dummy variables on the fly) by writing
+
+```{r, eval=FALSE}
+glm(formula = y ~ x1 + x2 + factor(x3), family = family(link = "link"),
+            data = )
+```
+
+# Setting up regression interactions
+
+- There are also some useful shortcuts for regressing on interaction terms:
+
+`x1:x2` interacts all terms in x1 with all terms in x2
+```{r}
+summary(lm(lifeExp ~ log(gdpPercap) + log(pop) +
+                    continent:factor(year), 
+                    data = gap))
+```
+
+`x1*x2` produces the cross of x1 and x2, or x1+x2+x1:x2
+```{r}
+summary(lm(lifeExp ~ log(gdpPercap) + log(pop) + continent*factor(year), 
+                data = gap))
+```
+
+
+# Smoothing
+
+Linear regression and GLMs are of course useful, but often the relationship is not linear, even on some transformed scale.
+
+Additive models and generalized additive models (GAMs) are the more flexible variants on linear models and GLMs.
+
+There are a variety of tools in R for modeling nonlinear and smooth relationships, mirroring the variety of methods in the literature.
+
+One workhorse is `gam()` in the *mgcv* package.
+
+# GAM in action
+
+Do we think there should be a linear relationship of life expectancy with GDP and year?
+
+```{r gamExample, cache=TRUE, fig.width=10, fig.cap = ""}
+library(mgcv)
+
+mod <- gam(lifeExp ~ s(gdpPercap, k = 30) + s(year, k = 10), data = gap)
+
+plot(mod)
+summary(mod)
+
+mod2 <- gam(lifeExp ~ s(log(gdpPercap), k = 30) + s(year, k = 10), data = gap)
+plot(mod2)
+```
+
+If we were serious about building a good-fitting model, we could use the same kind of functionality as in lm/glm in terms of factors and interactions.
+
+# How does GAM choose how much to smooth?
+
+GAM uses the data to choose how much smoothing to do. Roughly one can think of what it is doing as carrying out cross-validation and choosing the best amount of smoothing for predicting held-out data.
+
+`k` simply sets an upper bound on the amount of smoothing (you can think if `k` as the number of degrees of freedom - one would be a linear fit).
+
+ - Make sure `k` is less than the number of unique values of the predictor variable
+ - The default for `k` is relatively small and in some cases this may overly limit the smoothness of the curve.
+    - You can try increasing `k` and see if it increases the fit.
+    - If `summary` reports and `edf` that is close to `k` that often suggests that `k` should be increased.
+
+# Distributions
+
+Since R was developed by statisticians, it handles distributions and simulation seamlessly.
+
+All commonly-used distributions have functions in R. Each distribution has a family of functions: 
+
+* d - probability density/mass function, e.g. `dnorm()`
+* r - generate a random value, e.g., `rnorm()`
+* p - cumulative distribution function, e.g., `pnorm()`
+* q - quantile function (inverse CDF), e.g., `qnorm()`
+
+Some of the distributions include the following (in the form of their random number generator function): `rnorm()`, `runif()`, `rbinom()`, `rpois()`, `rbeta()`, `rgamma()`, `rt()`, `rchisq()`.
+
+# Distributions in action
+
+```{r, fig.cap = ""}
+pnorm(1.96)
+qnorm(.975)
+dbinom(0:10, size = 10, prob = 0.3)
+dnorm(5)
+dt(5, df = 1)
+
+x <- seq(-5, 5, length = 100)
+plot(x, dnorm(x), type = 'l')
+lines(x, dt(x, df = 1), col = 'red')
+```
+
+```{r, fig.cap = ""}
+rmultinom(1, 100, prob = c(.1, .1, .2, .3, .25, .05)) 
+
+x <- seq(0, 10, length = 100)
+plot(x, dchisq(x, df = 1), type = 'l')
+lines(x, dchisq(x, df = 2), col = 'red')
+```
+
+# Other types of simulation and sampling
+
+We can draw a sample with or without replacement.
+
+```{r}
+sample(1:nrow(gap), 20, replace = FALSE)
+```
+
+Here's an example of some code that would be part of coding up a bootstrap. As I mentioned previously, this would be a weird dataset to do formal statistical inference on given it includes most of the countries in the world, though one could think about fitting models for the variation over time, treating short-term fluctuations as random.
+
+```{r}
+# actual mean
+mean(gap$lifeExp, na.rm = TRUE)
+# here's a bootstrap sample:
+smp <- sample(seq_len(nrow(gap)), replace = TRUE) 
+mean(gap$lifeExp[smp], na.rm = TRUE)
+```
+
+It's a good idea to use `seq_along()` and `seq_len()` and not syntax like `1:length(gap)` in `sample()` because the outcome of `length()` might in some cases be unexpected (e.g., if you're taking subsets of a dataset). Similar reasoning holds when setting up for loops: e.g., 
+
+```{r eval=FALSE}
+for(i in seq_len(nrow(gap))) {
+# blah
+}
+```
+
+# The Random Seed
+
+A few key facts about generating random numbers
+
+* Random number generation is based on generating uniformly between 0 and 1 and then transforming to the kind of random number of interest: normal, categorical, etc.
+* Random numbers on a computer are *pseudo-random*; they are generated deterministically from a very, very, very long sequence that repeats
+* The *seed* determines where you are in that sequence
+
+To replicate any work involving random numbers, make sure to set the seed first.
+
+```{r}
+set.seed(1)
+vals <- sample(1:nrow(gap), 10)
+vals
+vals <- sample(1:nrow(gap), 10)
+vals
+set.seed(1)
+vals <- sample(1:nrow(gap), 10)
+vals
+```
+
+# Optimization
+
+R provides functionality for optimization - finding maxima or minima of a function. 
+
+A workhorse is `optim()`, which implements a number of optimization algorithms. 
+
+```{r eval=FALSE, fig.cap = ""} 
+library(fields)  
+```
+
+```{r fig.width=11, fig.height=5, fig.cap = ""}
+ banana <- function(x) {   ## Rosenbrock Banana function
+         x1 <- x[1]
+         x2 <- x[2]
+         100 * (x2 - x1 * x1)^2 + (1 - x1)^2
+     }
+
+x1s <- x2s <- seq(-5, 5, length = 100)
+x <- expand.grid(x1s, x2s)
+fx <- apply(x, 1, banana)
+
+par(mfrow = c(1, 2), mai = c(.45, .4, .1, .4))
+image.plot(x1s, x2s, matrix(fx, 100), xlab = '', ylab = '')
+image.plot(x1s, x2s, matrix(log(fx), 100), xlab = '', ylab = '')
+
+optim(c(-2,0), banana)
+```
+We can see the progression of evaluations of the objective function:
+```{r eval=FALSE, fig.cap = ""}
+banana <- function(x) {   ## Rosenbrock Banana function
+         points(x[1],x[2])
+         Sys.sleep(.03)
+         x1 <- x[1]
+         x2 <- x[2]
+         100 * (x2 - x1 * x1)^2 + (1 - x1)^2
+     }
+par(mfrow = c(1, 1), mai = c(.45, .4, .1, .4))
+image.plot(x1s, x2s, matrix(log(fx), 100), xlab = '', ylab = '')
+optim(c(-2,0), banana)
+```
+
+
+# Dates
+- R has built-in ways to handle dates (don't reinvent the wheel!) 
+
+```{r dates}
+date1 <- as.Date("03-01-2011", format = "%m-%d-%Y")
+date2 <- as.Date("03/02/11", format = "%m/%d/%y")
+date3 <- as.Date("07-May-11", format = "%d-%b-%y")
+
+date1; date2
+class(date1)
+dates <- c(date1, date2, date3)
+weekdays(dates)
+dates + 30
+date3 - date2
+unclass(dates)
+```
+- The origin date in R is January 1, 1970
+
+
+# Time too!
+
+```{r}
+library(chron)
+d1 <- chron("12/25/2004", "10:37:59") 
+# default format of m/d/Y and h:m:s
+d2 <- chron("12/26/2004", "11:37:59")
+
+class(d1)
+d1
+d1 + 33
+d2 - d1
+d1 + d2
+```
+
+There's lots more packages/functionality for dates/times: see *lubridate* and `?DateTimeClasses`
+ 
+# Breakout 
+
+### Basics
+
+1) Generate 100 random Poisson values with a population mean of 5. How close is the mean of those 100 values to the value of 5?
+
+2) What is the 95th percentile of a chi-square distribution with 1 degree of freedom?
+
+3) What's the probability of getting a value greater than 5 if you draw from a standard normal distribution? What about a t distribution with 1 degree of freedom?
+
+### Using the ideas
+
+4) Fit two linear regression models from the gapminder data, where the outcome is `lifeExp` and the explanatory variables are `log(pop)`, `log(gdpPercap)`, and `year`. In one model, treat `year` as a numeric variable. In the other, factorize the `year` variable. How do you interpret each model?
+
+5) Consider the code where we used `sample()`.  Initialize a storage vector of 500 zeroes. Set up a bootstrap using a for loop, with 500 bootstrap datasets. Here are the steps within each iteration:
+
+  - resample with replacement a new dataset of the same size as the actual dataset
+  - assign the value of the mean of the delay for the bootstrap dataset into the storage vector
+  - repeat
+
+Now plot a histogram of the 500 values - this is an estimate of the sampling distribution of the sample mean. 
+
+6) Modify the GAMs of lifeExp on gdpPercap and set `k` to a variety of values and see how the estimated relationships change. What about the estimated uncertainties?
+
+### Advanced 
+
+7) Fit a logistic regression model where the outcome is whether `lifeExp` is greater than or less than 60 years, exploring the use of different predictors.
+
+8) Suppose you wanted to do 10-fold cross-validation for some sort of regression model fit to the *gap* dataset. Write some R code that produces a field in the dataset that indicates which fold each observation is in. Ensure each of the folds has an equal (or as nearly equal as possible if the number of observations is not divisible by 10) number of observations. Hint: consider the *times* argument to the `rep()` function. (If you're not familiar with 10-fold cross-validation, it requires one to divide the dataset into 10 subsets of approximately equal size.)
+
+9) Write some code to demonstrate the central limit theorem. Generate many different replicates of samples of size `n` from a skewed or discrete distribution and show that if `n` is big enough, the distribution of the means (of each sample of size `n`) looks approximately normal in a histogram. Do it without any looping (using techniques from earlier modules)! I.e., I want you to show that if you have a large number (say 10,000) of means, each mean being the mean of `n` values from a distribution, the distribution of the means looks approximately normal if `n` is sufficiently big.
+
+

@@ -1,0 +1,352 @@
+% R bootcamp, Module 1: Basics
+% August 2019, UC Berkeley
+% Chris Paciorek
+
+```{r chunksetup, include=FALSE, cache=TRUE} 
+# include any code here you don't want to show up in the document,
+# e.g. package and dataset loading
+if(!('modules' %in% unlist(strsplit(getwd(), split = '/')))) setwd('modules')
+gap <- read.csv(file.path('..', 'data', 'gapminder-FiveYearData.csv'), stringsAsFactors = FALSE)
+```
+
+# R as a calculator
+
+```{r computing,echo=TRUE,results='markup'}
+2 + 2 # add numbers
+2 * pi # multiply by a constant
+7 + runif(1) # add a random number
+3^4 # powers
+sqrt(4^4) # functions
+log(10)
+log(100, base = 10)
+23 %/% 2 
+23 %% 2
+
+# scientific notation
+5000000000 * 1000
+5e9 * 1e3
+```
+
+Think of a mathematical operation you need - can you guess how to do it in R?
+
+Side note to presenter: turn off R Notebook inline view via RStudio -> Preferences -> R Markdown -> Show output inline ...
+
+# Assigning values to R objects
+
+A key action in R is to store values in the form of R objects, and to examine the value of R objects.
+
+```{r}
+val <- 3
+val
+print(val)
+
+Val <- 7 # case-sensitive!
+print(c(val, Val))
+```
+
+We can work with (and store) sequences and repetitions
+```{r}
+mySeq <- 1:6
+mySeq
+
+years <- seq(1952, 2007, by = 5)
+years
+length(years)
+
+country <- rep("Afghanistan", 12)
+country 
+
+## This is a comment: here is an example of non-numeric data
+countries <- c("Afghanistan", "India", "Pakistan")
+countries
+```
+
+If we don't assign the output of a command to an object, we haven't saved it for later use.
+
+R gives us a lot of flexibility (within certain rules) for assigning to (parts of) objects from (parts of) other objects.
+
+# How to be [lazy](http://dilbert.com/strips/comic/2005-05-29/)
+
+If you're starting to type something you've typed before, or the long name of an R object or function, STOP!  You likely don't need to type all of that.
+
+- Tab completion
+- Command history 
+    * up/down arrows
+    * Ctrl-{up arrow} or Command-{up arrow}
+- RStudio: select a line or block for execution
+- Put your code in a file and use `source()`. For example: `source('myRcodeFile.R')`
+
+**Question**: Are there other tricks that anyone knows of?
+
+RStudio has lots of shortcuts. See [here](https://appsilon.com/r-studio-shortcuts-and-tips/) and [here](https://www.r-bloggers.com/r-studio-shortcuts-and-tips-part-2).
+
+# Vectors in R
+
+The most basic form of an R object is a vector. In fact, individual (scalar) values are vectors of length one. 
+
+We can concatenate values into a vector with `c()`.
+
+```{r}
+## numeric vector
+nums <- c(1.1, 3, -5.7)
+devs <- rnorm(5)
+devs
+
+## integer vector
+ints <- c(1L, 5L, -3L) # force storage as integer not decimal number
+## 'L' is for 'long integer' (historical)
+
+nObs <- 1000
+mySample <- sample(1:1000, 100, replace = TRUE)
+
+## character vector
+chars <- c('hi', 'hallo', "mother's", 'father\'s', 
+   "She said, 'hi'", "He said, \"hi\"" )
+chars
+cat(chars, sep = "\n")
+
+## logical vector
+bools <- c(TRUE, FALSE, TRUE)
+bools
+```
+
+# Working with indices and subsets
+
+```{r}
+vals <- seq(2, 12, by = 2)
+vals
+
+vals[3]
+vals[3:5]
+vals[c(1, 3, 6)]
+vals[-c(1, 3, 6)]
+vals[c(rep(TRUE, 3), rep(FALSE, 2), TRUE)]
+
+#######################################################################
+## IMPORTANT: read in the Gapminder dataset from disk;
+## first make sure your working directory is the 'modules' directory
+getwd()
+## if the result is not the 'modules' subdirectory of the bootcamp
+## directory, set the working directly along the lines of this:
+##
+## setwd('/Users/paciorek/Desktop/r-bootcamp-winter-2019/modules')
+##
+## replace '/Users/paciorek/Desktop' with whatever directory you put the bootcamp
+## materials in; e.g. on Windows it might be something like
+## 'C:\\Users\\sarah\\r-bootcamp-winter-2019\\modules'
+##
+## If you've done that correctly, then the next command reads
+## in the dataset from the 'data' directory. In the next
+## command R finds that directory relative to the current
+## working directory.
+gap <- read.csv("../data/gapminder-FiveYearData.csv",
+          stringsAsFactors = FALSE)
+#######################################################################
+
+## create a simple vector from the Gapminder dataset
+gdp <- gap$gdpPercap
+gdp[1:10]
+
+```
+We can substitute values into vectors
+```{r}
+gdp[4] <- 822.9711
+
+vals <- rnorm(100)
+vals[1:2] <- 0
+
+## How does R process these next subset operations?
+vals[vals < 0] <- 0
+vals[1:8]
+
+wealthy <- gdp[gdp > 100000]
+gdp[1:10]
+```
+
+# Vectorized calculations and comparisons
+
+At the core of R is the idea of doing calculations on entire vectors.
+
+```{r}
+gdpTotal <- gap$gdpPercap * gap$pop
+
+tmp <- gdpTotal[gap$year == "2007"]
+gdpSubset <- tmp[1:20]
+
+gdpSubset >= 1e6  # Dr. Evil's version of "a lot"
+
+vec1 <- rnorm(5)
+vec2 <- rnorm(5)
+vec1 > vec2
+
+vec1 == vec2
+vec1 != vec2
+## careful: 
+vec1 = vec2
+identical(vec1, vec2)
+
+## using 'or'
+gdpSubset >= 1e12 | gdpSubset <= 1e10
+## using 'and'
+gap$lifeExp[1:10] < 75 & gap$continent[1:10] == "Americas"
+```
+
+# R is a functional language
+
+* Operations are carried out with functions. Functions take objects as inputs and return objects as outputs. 
+* An analysis can be considered a pipeline of function calls, with output from a function used later in a subsequent operation as input to another function.
+* Functions themselves are objects: 
+```{r}
+median
+class(median)
+median(gap$lifeExp)
+```
+
+Functions generally take arguments, some of which are often optional:
+```{r}
+maxYear <- max(gap$year)
+lifeExp <- gap$lifeExp[gap$year == maxYear]
+median(lifeExp)
+```
+
+* We can embed function calls: 
+```{r, hist, fig.cap = ""}
+hist(rnorm(1000))
+```
+
+# Getting help about a function
+
+To get information about a function you know exists, use `help` or `?`, e.g., `?lm`. For information on a general topic, use `apropos`.
+
+```{r eval = FALSE}
+help(lm)
+?lm
+
+?log
+
+apropos("mean")
+```
+
+# Basic kinds of R objects
+
+Vectors are not the only kinds of R objects.
+
+### Vectors 
+
+Vectors of various types (numeric (i.e., decimal/floating point/double), integer, boolean, character), all items must be of the same type
+
+### Data frames
+
+Collections of columns of potentially different types
+
+```{r}
+head(gap)
+dim(gap)
+nrow(gap)
+names(gap)
+class(gap)
+is.matrix(gap)
+class(gap$year)
+class(gap$lifeExp)
+class(gap$country)
+```
+
+### Lists
+
+Collections of disparate or complicated objects
+
+```{r}
+myList <- list(stuff = 3, mat = matrix(1:4, nrow = 2), 
+   moreStuff = c("china", "japan"), list(5, "bear"))
+myList
+myList[[1]] # result is not (usually) a list (unless you have nested lists)
+identical(myList[[1]], myList$stuff)
+myList$moreStuff[2]
+myList[[4]][[2]]
+myList[1:3] # subset of a list is a list
+myList$newOne <- 'more weird stuff'
+names(myList)
+```
+
+Lists can be used as vectors of complicated objects. E.g., suppose you have a linear regression for each value of a stratifying variable. You could have a list of regression fits. Each regression fit will itself be a list, so you'll have a list of lists.
+
+
+# Converting between different types of objects
+
+You can use the `as()` family of functions.
+
+```{r}
+ints <- 1:10
+as.character(ints)
+as.numeric(c('3.7', '4.8'))
+```
+
+Be careful: R tries to be helpful and convert between types/classes when it thinks it's a good idea. Sometimes it is overly optimistic. 
+
+```{r}
+indices <- c(1.7, 2.3)
+ints[indices]
+ints[0.999999999]
+```
+
+
+# A bit on plotting
+
+R has several different plotting systems:
+
+- *base* graphics
+- *lattice* graphics
+- *ggplot2* (an add-on package)
+
+We'll see a little bit of *base* graphics here and then *lattice* and *ggplot2* tomorrow in Module 8.
+
+```{r basic_plots, fig.cap =""}
+hist(gap$lifeExp)
+plot(gap$lifeExp ~ gap$gdpPercap)
+boxplot(gap$lifeExp ~ gap$year)
+```
+
+# Graphics options
+
+Check out `help(par)` for various [graphics settings](http://xkcd.com/833/); these are set via `par()` or within the specific graphics command (some can be set in either place), e.g.,
+```{r, parstuff, fig.cap = ""}
+par(pch = 16)
+plot(gap$lifeExp ~ gap$gdpPercap, xlab = 'GDP per capita (dollars)',
+   ylab = 'life expectancy (years)', log = 'x')
+```
+
+# Breakout
+
+In general, your answers to any questions should involve writing code to manipulate objects. For example, if I ask you to find the maximum flight delay, do not scan through all the values and find it by eye. Use R to do the calculations and print results.
+
+### Basics
+
+1) Create a variable called 'x' that contains the mean life expectancy.
+
+2) Use functions in R to round 'x' to two decimal places and to two significant digits.
+
+3) Create a vector of GDP per capita in units of Euros rather than dollars.
+
+4) Create a boolean (TRUE/FALSE) vector indicating whether total country GDP is greater than 1 trillion dollars. When entering 1 trillion, use R's scientific notation.
+
+### Using the ideas
+
+5) Use the boolean vector from problem 4 to produce a new vector containing the per capita GDP only from the biggest economies.
+
+6) Plot life expectancy against gdpPercap with gdpPercap values greater than 40000 set to 40000.
+
+7) Make a histogram of the life expectancy values for the year 2007.  Explore the effect of changing the number of bins in the histogram using the 'breaks' argument.
+
+8) Subset the data to those for the year 2007 (there is a way to do this all at once, but using what we've seen already, you can pull out and subset the individual columns you need). Plot life expectancy against GDP per capita. Add a title to the plot. Now plot so that data for Asia are in one color and those for all other countries are in another color and those for all other continents are in another, using the 'col' argument. Hint: 'col' can take a vector of colors such as "black","red","black", ...
+
+
+### Advanced
+
+9) Consider the following regression model.  Figure out how to extract the $R^2$ and residual standard error and store in new R variables. 
+
+```{r}
+mod <- lm(lifeExp ~ log(gdpPercap), data = gap)
+summ <- summary(mod)
+```
+
+10) Take your plot from problem 8. Now modify the size of the points. Add a legend. Rotate the numbers on the y-axis so they are printed horizontally. Recall that `help(par)` will provide a lot of information.

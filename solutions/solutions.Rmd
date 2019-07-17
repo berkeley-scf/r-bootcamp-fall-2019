@@ -1,0 +1,540 @@
+% R bootcamp, Breakout Solutions
+% January 2019, UC Berkeley
+% Chris Paciorek
+
+```{r chunksetup, include=FALSE, cache=TRUE} 
+# include any code here you don't want to show up in the document,
+# e.g. package and dataset loading
+if(Sys.getenv('USER') == 'paciorek') rm(list = ls())
+if(!('modules' %in% unlist(strsplit(getwd(), split = '/')))) setwd('modules')
+gap <- read.csv('../data/gapminder-FiveYearData.csv', stringsAsFactors = FALSE)
+```
+
+# Module 1: Basics
+
+
+```{r basics1}
+## 1 ##
+x <- mean(gap$lifeExp)
+
+## 2 ##
+# help(round)
+round(x, digits = 2)
+round(x, digits = 0)
+
+## 3 ##
+EurosPerDollar <- 1.1  
+gdpPercap_euro <- gap$gdpPercap * EurosPerDollar
+c(gdpPercap_euro[1], gap$gdpPercap[1])
+
+## 4 ##
+big <- gap$gdpPercap * gap$pop > 1e12 
+head(big)
+```
+
+```{r using_the_ideas1}
+
+## 5 ##
+big <- gap$gdpPercap * gap$pop > 1e12 
+big_gdpPercap <- gap$gdpPercap[big]
+big_gdpPercap
+
+## 6 ##
+gdp_cens <- gap$gdpPercap
+cens_value <- 40000
+gdp_cens[gdp_cens > cens_value] <- cens_value
+plot(gap$lifeExp ~ gdp_cens)
+
+## 7 ##
+lifeExp2007 <- gap$lifeExp[gap$year == 2007]
+hist(lifeExp2007)
+hist(lifeExp2007, breaks = 5)
+hist(lifeExp2007, breaks = 25)
+
+## 8 ##
+gap2007 <- gap[gap$year == 2007, ]
+plot(gap2007$lifeExp ~ gap2007$gdpPercap, main = 'Life expectancy by GDP')
+gap2007$color <- "blue"
+gap2007$color[gap2007$continent == 'Asia'] <- "red"
+plot(gap2007$lifeExp ~ gap2007$gdpPercap, col = gap2007$color, 
+                     main = 'Life expectancy by GDP, highlighting Asia')
+
+## or if you didn't realize that one could subset rows from a data frame
+## (which we haven't seen yet!), you could do this:
+lifeExp2007 <- gap$lifeExp[gap$year == 2007]
+gdpPercap2007 <- gap$gdpPercap[gap$year == 2007]
+cont2007 <- gap$continent[gap$year == 2007]
+plot(lifeExp2007 ~ gdpPercap2007, main = 'Life expectancy by GDP')
+colors <- rep('blue', length(lifeExp2007))
+colors[cont2007] <- "red"
+plot(lifeExp2007 ~ gdpPercap2007, col = colors, 
+                     main = 'Life expectancy by GDP, highlighting Asia')
+
+
+```{r advanced1}
+
+## 9 ##
+mod <- lm(lifeExp ~ log(gdpPercap), data = gap)
+summ <- summary(mod)
+r2 <- summ$r.squared
+sigError <- summ$sigma
+```
+
+
+## 10 ##
+gap2007 <- gap[gap$year == 2007, ]
+gap2007$color <- "blue"
+gap2007$color[gap2007$continent == 'Asia'] <- "red"
+plot(gap2007$lifeExp ~ gap2007$gdpPercap, col = gap2007$color, 
+                     main = 'Life expectancy by GDP, highlighting Asia',
+                     cex = 0.7, las = 1)
+legend("bottomright", legend = c('Asia', 'all other'), col = c('red', 'blue'), cex = 0.7, pch = 1)
+```
+
+
+# Module 2: Managing R and R resources
+
+```{r, basics2}
+## 1 ##
+install.packages('lmtest', repos = 'https://cran.cnr.berkeley.edu')
+
+## 2 ##
+getwd()
+```
+
+```{r, using_the_ideas2}
+## 3 ##
+curdir <- getwd()
+system('cp ../data/cpds.csv ~/Downloads')  # accessing system calls within R (won't work in Windows)
+setwd('~/Downloads')  # setwd('C:\\Users\\Your_Username\\Downloads')
+cpds <- read.csv('cpds.csv')
+setwd('~/Desktop')  # setwd('C:\\Users\\Your_Username\\Desktop')
+write.csv(cpds, file = 'new_cpds.csv', row.names = FALSE, quote = FALSE)
+
+## 4 ## 
+pdf('test1.pdf')
+hist(gap$lifeExp)
+dev.off()
+
+pdf('test2.pdf', height = 2, width = 2)
+hist(gap$lifeExp)
+dev.off()
+
+## 5 ##
+library(graphics)
+library(maps)
+searchpaths()
+
+setwd(curdir)
+```
+
+```{r, advanced2}
+## 6 ##
+library(spam)
+backsolve
+base::backsolve
+search()
+```
+
+# Module 3: Working with objects and data
+
+```{r, basics3}
+## 1 ##
+gap[5, ]
+
+## 2 ##
+gap[ nrow(gap) , ]
+
+## 3 ##
+sum(gap$gdpPercap > 50000)
+
+## 4 ##
+gap2 <- gap
+gap2$gdpPercap[ gap2$gdpPercap > 50000 ] <- NA
+
+## 5 ##
+paste(gap$country[1], gap$year[1], sep = "-")
+```
+
+```{r, using_the_ideas3}
+## 6 ##
+paste("There are ", nrow(gap), " rows in the dataset.", sep = "")
+
+## 7 ##
+gap[ nrow(gap), ]
+
+## 8 ##
+economical <- gap$lifeExp > 75 & gap$gdpPercap < 10000
+mean(economical)   # sum(economical) / length(economical)
+
+## 9 ##
+sub <- gap[ economical , ]
+
+## 10 ##
+attributes(gap)
+names(attributes(gap))
+class(attributes(gap))
+```
+
+```{r, advanced3}
+
+## 11 ##
+head(gap)
+nm <- paste(gap$continent, gap$country, gap$year, sep = "-")
+attributes(gap)$row.names <- nm
+head(gap)
+```
+
+# Module 4: Calculations
+
+```{r, basics4}
+## 1 ##
+gap$country_year <- paste(gap$country, gap$year, sep = "-")
+head(gap$country_year)
+
+## 2 ##
+table(gap2007$continent)
+```
+
+```{r, using_the_ideas4}
+## 3 ##
+tmp <- gap[ , -which(names(gap) == "continent")]
+
+# column names
+names(gap)
+# logical indicating which = 'continent'
+names(gap) == "continent"
+# index of the continent column
+which(names(gap) == "continent")
+# exclude that column
+gap[ , -which(names(gap) == "continent")] 
+
+## 4 ##
+sapply(gap, function(x) sum(is.na(x)))
+
+## 5 ##
+range(gap$gdpPercap)
+gap$gdp_binned <- cut(gap$gdpPercap,
+       breaks = c(0, 1000, 2000, 5000, 10000, 20000, 30000, Inf))
+table(gap$gdp_binned)
+
+## 6 ##
+boxplot(lifeExp ~ gdp_binned, data = gap)
+
+## 7 ##
+tmp <- gap[order(gap$lifeExp), ]
+tmp[1, ]
+gap[which.min(gap$lifeExp), ]
+# That's actually BEFORE the genocide occurred.
+
+## 8 ##
+pop <- aggregate(gap$pop, by = list(year = gap$year),
+                 FUN = sum)
+
+## 9 ##
+gap2 <- merge(gap, pop, by.x = 'year',
+                    by.y = 'year', all.x = TRUE, all.y = FALSE)
+plot(gap2$x, gap2$lifeExp)
+
+
+
+## 10 ##
+y <- matrix(sample(1:10, 12, replace = TRUE), 
+nrow = 3, ncol = 4)
+
+## 10b ##
+yidot <- rowSums(y)
+ydotj <- colSums(y)
+e <- outer(yidot, ydotj) / sum(y)
+
+## 10a ##
+chi2 <- sum( (y - e)^2 / e)
+# chi2 <- sum(colSums( (y-e)^2 / e ))
+```
+
+```{r, advanced4}
+## 11 ## 
+aggregate(gap$lifeExp, by = list(gap$year, gap$continent),
+quantile, probs = 0.95, na.rm = TRUE)
+
+
+# Module 5: Programming
+
+```{r, basics6}
+## 1 ##
+threshZero <- function(x) {
+   x[x < 0] <- 0
+   return(x)
+}
+```
+
+```{r, using_the_ideas6}
+## 2 ##
+thresh <- function(x, threshold = 0, below = TRUE) {
+    if(below) {
+       x[ x < threshold ] <- threshold
+    } else {
+       x[ x > threshold ] <- threshold
+    }
+    return(x)
+}
+
+## 3 ##
+thresh <- function(x, threshold = 0, below = TRUE) {
+    if(!is.numeric(x) || is.list(x)) stop("'x' must be a numeric vector")
+    if(below) {
+       x[ x < threshold ] <- threshold
+    } else {
+       x[ x > threshold ] <- threshold
+    }
+    return(x)
+}
+
+## 4 ##
+colSort <- function(data, col1, col2) {
+    ord <- order(data[, col1], data[, col2], decreasing=TRUE)
+    sorted <- data[ord, ]
+    invisible(sorted)
+}
+```
+
+```{r, advanced6}
+## 5 ##
+colSort <- function(data, ...) {
+    ord <- order(..., decreasing=TRUE)
+    sorted <- data[ord, ]
+    invisible(sorted)
+}
+
+## 6 ##
+colSort <- function(data, ..., cols = NULL, decreasing = FALSE) {
+   if(is.null(cols)) {
+      ord <- order(..., decreasing = decreasing)
+   } else {
+     if((!is.numeric(cols) && !is.character(cols)) || is.list(cols))
+        stop("'cols' must be a numeric or character vector")
+     if(is.numeric(cols) && max(cols) > ncol(data) ||
+        is.character(cols) && any(!cols %in% names(data)))
+           stop("'cols' refers to non-existent column")
+      ord <- do.call(order, data[ , cols])
+   }
+   sorted <- data[ord, ]
+   invisible(sorted)
+}
+
+## 7 ##
+funGenerator <- function(x) {
+   x <- 10
+   g <- function(y) {
+      return(x + y)
+   }
+   return(g)
+}
+
+x <- 2
+f <- funGenerator()
+f(1)
+
+ls(environment(f))
+environment(f)$x
+```
+
+# Module 6: Data manipulation using the tidyverse
+
+```{r, basics5}
+library(tidyr)
+
+## 1 ##
+gap_median_lifeExp <- gap %>%
+    group_by(continent) %>%
+    summarize(med_lifeExp = median(lifeExp))
+
+## 2 ## 
+gap_pop_continent <- gap %>%
+    group_by(continent, year) %>%
+    mutate(continent_pop = sum(pop))
+
+## 3 ##
+gap_rel_gdp <- gap %>%
+    group_by(continent, year) %>%
+    mutate(gdpPercap_diff = gdpPercap - mean(gdpPercap)) %>%
+    arrange(desc(gdpPercap_diff))
+
+## 4 ##
+gap_wider <- gap_rel_gdp %>% 
+  select(country, year, gdpPercap_diff) %>% 
+  spread(year, gdpPercap_diff)
+
+```
+
+
+# 7) Module 7: Core tools
+
+```{r, basics7}
+## 1 ##
+popMean <- 5
+x <- rpois(100, popMean)
+mean(x) - popMean
+
+## 2 ##
+qchisq(0.95, 1)
+
+## 3 ##
+1 - pnorm(5)  # pnorm(5, upper.tail = TRUE)
+1 - pt(5, df = 1)
+```
+
+```{r, using_the_ideas7}
+
+## 4 ##
+reg1 <- lm(lifeExp ~ log(gdpPercap) + log(pop) + year, 
+                data=gap)
+## here we assume a linear relationship of gdp with year
+## this is not flexible but allows us to fit the model with less data
+
+reg2 <- lm(lifeExp ~ log(gdpPercap) + log(pop) + factor(year), 
+                data = gap)
+## here we assume a completely arbitrary relationship of gdp with year
+## we need enough data in each year to be able to reasonably estimate the average lifeExp for that year, given the other explanatory variables
+
+
+## 5 ##
+nBoot <- 500
+vals <- rep(0, nBoot)
+
+for(i in seq_len(nBoot)) { 
+      smp <- sample(seq_len(nrow(gap)), replace = TRUE) 
+      vals[i] <- mean(gap$lifeExp[smp], na.rm = TRUE)
+}
+hist(vals)
+
+## bootstrap based standard error (s.d. of sampling distribution)
+se_boot <- sd(vals)
+
+## standard error using usual sigma/sqrt(n) calculation
+n <- sum(!is.na(gap$lifeExp))
+se_norm <- sd(gap$lifeExp, na.rm = TRUE) / sqrt(n)
+
+## 6 ##
+mod <- gam(lifeExp ~ s(gdpPercap, k = 30) + s(year, k = 10), data = gap)
+plot(mod)
+summary(mod)
+
+mod <- gam(lifeExp ~ s(gdpPercap, k = 60) + s(year, k = 10), data = gap)
+plot(mod)
+summary(mod)  # edf values are about the same as previously so 'k' is not constraining
+
+mod <- gam(lifeExp ~ s(gdpPercap, k = 4) + s(year, k = 3), data = gap)
+plot(mod)
+# Now the edf is much lower (and R^2 has decreased).
+# Note that uncertainty is decreased under the nearly linear fit for year.
+
+```
+
+```{r, advanced7}
+
+## 7 ##
+library(dplyr)
+gap2 <- gap %>%
+  mutate(sign = ifelse(lifeExp > 60, 1, 0))
+
+reg_logit <- glm(sign ~ log(gdpPercap) + log(pop),
+                family = binomial(link = "logit"), data = gap2)
+
+## 8 ## 
+nFolds <- 10
+n <- nrow(gap)
+fold_size <- rep(round(n / nFolds), nFolds)
+fold_size[nFolds] <- n - (nFolds - 1)*fold_size[1]
+
+fold <- rep(1:nFolds, times = fold_size)
+table(fold)
+set.seed(1)
+gap$fold <- sample(fold, replace = TRUE)
+
+## 9 ##
+n <- 100
+nReps <- 10000
+data <- matrix(rpois(n*nReps, 3), ncol = nReps)
+mns <- colMeans(data)
+par(mfrow = c(1, 2))
+hist(mns)
+qqnorm(mns)
+```
+
+# Module 8: Graphics
+
+```{r, basics8}
+
+## 1 ##
+ggplot(data = gap, aes(x = lifeExp)) + geom_histogram()
+
+## 2 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() 
+
+## 3 ##
+pdf('delays.pdf')
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + 
+  ggtitle("Life expectancy vs. per capita GDP") + xlab(label = "GDP per capita (dollars)") +
+  ylab(label = "life expectancy (years)")
+dev.off()
+
+## 4 ##
+ggplot(data = gap, aes(x = factor(year), y = lifeExp)) + geom_boxplot()
+```
+
+```{r, using_the_ideas8}
+## 5 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + facet_wrap(~year, nrow = 3, ncol = 4)
+
+## 6 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp, color = continent)) + geom_point() + scale_x_continuous(limits = c(100, 50000))
+
+## 7 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp, color = continent)) + geom_point() + scale_x_log10(limits = c(100, 50000))
+```
+
+```{r, advanced8}
+
+## 6 ##
+
+## We need the alpha set for transparency so we don't hide points.
+
+gap %>% filter(year == 2007) %>% 
+    ggplot(aes(x = gdpPercap, y = lifeExp, size = pop)) +
+            geom_point(aes(color = continent), show.legend = FALSE, alpha = 0.7) +
+            geom_point(show.legend = FALSE, col = 'black', pch = 1) + 
+            scale_size_continuous(range = c(1,20)) +
+            scale_x_continuous(trans = scales::log_trans(2), 
+                                     breaks = c(1000,2000,4000,8000,16000,32000,64000),
+                                     labels = c('1000','2000','4000','8000','16k','32k','64k')) +
+            scale_y_continuous(limits = c(35,90), breaks = seq(40, 85, by = 5)) +
+            xlab("Income per person, $/year (GDP/capita)") + ylab("") +
+            annotate("text", label = "Life expectancy, years", x = 700, y = 90, cex = 5) +
+            annotate("text", label = "Size: Population, Color: World Regions", cex = 6, x = 100000, y = 55, srt = 90, col = 'gray') +
+            theme(panel.grid = element_blank(), axis.line = element_line(), panel.background = element_blank())
+
+
+## Unless we figure out some way to make sure points are overlaid from largest to smallest. Let's try 'arranging' from largest to smallest.
+## And using some hints found online: https://stackoverflow.com/questions/19506630/control-point-border-thickness-in-ggplot)
+
+
+gap %>% filter(year == 2007) %>% arrange(desc(pop)) %>% 
+    ggplot(aes(x = gdpPercap, y = lifeExp, size = pop, fill = continent)) +
+                 geom_point(shape = 21, color = 'black', show.legend = FALSE) +
+            scale_size_continuous(range = c(1,20)) + 
+            scale_x_continuous(trans = scales::log_trans(2), 
+                                     breaks = c(1000,2000,4000,8000,16000,32000,64000),
+                                     labels = c('1000','2000','4000','8000','16k','32k','64k')) +
+            scale_y_continuous(limits = c(35,90), breaks = seq(40, 85, by = 5)) +
+            xlab("Income per person, $/year (GDP/capita)") + ylab("") +
+            annotate("text", label = "Life expectancy, years", x = 700, y = 90, cex = 5) +
+            annotate("text", label = "Size: Population, Color: World Regions", cex = 6, x = 100000, y = 55, srt = 90, col = 'gray') +
+            theme(panel.grid = element_blank(), axis.line = element_line(), panel.background = element_blank())
+
+
+## 7 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point(alpha = 0.3) + geom_smooth(method = "loess", color = 'red', se = FALSE)  + scale_x_log10(limits = c(100, 50000)) + facet_wrap(~year, nrow = 3) + theme_bw()
+```
+
+

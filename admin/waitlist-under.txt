@@ -1,0 +1,16 @@
+All, you're on the waitlist for the R bootcamp Aug 24-25 at Berkeley.
+We give first preference to Berkeley graduate students and postdocs, 
+and given high demand this year it's unlikely we'll be able to offer you a seat. 
+Furthermore, I likely won't know for sure until mid-August. 
+
+Note that for those receiving this who are undergraduates, taking
+Statistics 133 is a good way to learn R and about computing with data
+more generally.  In addition, the various courses in the Data Science
+Education Program will teach you either Python or R as part of
+learning data science, so those are good options too.
+Finally the D-Lab offers training in R frequently during the fall and 
+spring semesters.
+
+Thanks,
+Chris Paciorek
+
