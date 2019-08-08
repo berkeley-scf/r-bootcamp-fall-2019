@@ -6,9 +6,9 @@
 
 ## Where to find stuff
 
-The GitHub site ([https://github.com/berkeley-scf/r-bootcamp-winter-2019](https://github.com/berkeley-scf/r-bootcamp-winter-2019)) is the main site for the bootcamp. It has information on logistics, software installation, and is the master repository for materials for the modules.
+The GitHub site ([https://github.com/berkeley-scf/r-bootcamp-fall-2019](https://github.com/berkeley-scf/r-bootcamp-fall-2019)) is the main site for the bootcamp. It has information on logistics, software installation, and is the master repository for materials for the modules.
 
-We'll use the r-bootcamp-winter-2019@lists.berkeley.edu [Google group](https://groups.google.com/a/lists.berkeley.edu/d/forum/r-bootcamp-winter-2019) for discussion and answering questions during (and before) the bootcamp. 
+We'll use the r-bootcamp-fall-2019@lists.berkeley.edu [Google group](https://groups.google.com/a/lists.berkeley.edu/d/forum/r-bootcamp-fall-2019) for discussion and answering questions during (and before) the bootcamp. 
 
 If you have an administrative question, email r-bootcamp@lists.berkeley.edu.
 
@@ -26,9 +26,9 @@ The bootcamp will be organized in modules, each of which will be a combination o
 
 Many of the modules will use a common dataset as an example on which to carry out various operations. We'll focus on dataset of demographic/economic information (population, GDP per capita, life expectancy) for many of the countries in the world every five years, provided by the [Gapminder project](https://www.gapminder.org). (Note that this is almost the full population of countries -- I'll fit some statistical models but the interpretation is tricky as we are not working with a sample from a well-defined population.)
 
-Counselors will be available to help answer any questions you have (just wave to one of them), or feel free to just ask the presenter during the presentation. The counselors will also be monitoring the [Google group Q&A area](https://groups.google.com/a/lists.berkeley.edu/d/forum/r-bootcamp-winter-2019), so feel free to type in a question there (or send email to r-bootcamp-winter-2019@lists.berkeley.edu) and one of the counselors will answer the question. Or if you know the answer, help us out by answering it yourself or adding your thoughts. 
+Counselors will be available to help answer any questions you have (just wave to one of them), or feel free to just ask the presenter during the presentation. The counselors will also be monitoring the [Google group Q&A area](https://groups.google.com/a/lists.berkeley.edu/d/forum/r-bootcamp-fall-2019), so feel free to type in a question there (or send email to r-bootcamp-fall-2019@lists.berkeley.edu) and one of the counselors will answer the question. Or if you know the answer, help us out by answering it yourself or adding your thoughts. 
 
-Your counseloRs are: Nima Hejazi (Biostatistics), Miyabi Ishihara (Statistics), and Evan Muzzall (D-Lab).
+Your counseloRs are: Nima Hejazi (Biostatistics), Miyabi Ishihara (Statistics), Dana Seidel (ESPM alum), and Evan Muzzall (D-Lab).
 
 # Suggestions on how to get the most out of the bootcamp
 
@@ -51,7 +51,7 @@ A few additional thoughts on my pedagogical philosophy here:
 
 # RStudio and R Markdown
 
-We'll present most of the material from within RStudio, using R Markdown documents with embedded R code. R Markdown is an extension to the Markdown markup language that makes it easy to write HTML in a simple plain text format.  This allows us to both run the R code directly as well as compile on-the-fly to an HTML file that can be used for presentation. All files will be available on [Github](https://github.com/berkeley-scf/r-bootcamp-winter-2019).  
+We'll present most of the material from within RStudio, using R Markdown documents with embedded R code. R Markdown is an extension to the Markdown markup language that makes it easy to write HTML in a simple plain text format.  This allows us to both run the R code directly as well as compile on-the-fly to an HTML file that can be used for presentation. All files will be available on [Github](https://github.com/berkeley-scf/r-bootcamp-fall-2019).  
 
 Note: The files named *moduleX_blah_slides.html* have individual slides, while the files named *moduleX_blah.html* have the same content but all on one page.
 
@@ -65,8 +65,8 @@ To download the files from Github, you can do the following.
 
 Within RStudio go to File->New Project->Version Control->Git and enter:
 
-- "Repository URL": https://github.com/berkeley-scf/r-bootcamp-winter-2019
-- "Project Directory Name": r-bootcamp-winter-2019 (or something else of your choosing)
+- "Repository URL": https://github.com/berkeley-scf/r-bootcamp-fall-2019
+- "Project Directory Name": r-bootcamp-fall-2019 (or something else of your choosing)
 - "Directory": ~/Desktop (or somewhere of your choosing)
 
 Then to update from the repository to get any changes we've made, you can select (from within RStudio):
@@ -81,16 +81,16 @@ Be warned that you probably do not want to make your own notes or changes to the
 Run the following commands:
 
 - `cd /directory/where/you/want/repository/located`
-- `git clone https://github.com/berkeley-scf/r-bootcamp-winter-2019`
+- `git clone https://github.com/berkeley-scf/r-bootcamp-fall-2019`
 
 Then to update from the repository to get any changes we've made:
 
-- `cd /directory/where/you/put/the/repository/r-bootcamp-winter-2019`
+- `cd /directory/where/you/put/the/repository/r-bootcamp-fall-2019`
 - `git pull`
 
 ## As a zip file
 
-If you don't want to bother using Git or have problems, simply download a zip file with all the material from [https://github.com/berkeley-scf/r-bootcamp-winter-2019/archive/master.zip](https://github.com/berkeley-scf/r-bootcamp-winter-2019/archive/master.zip).
+If you don't want to bother using Git or have problems, simply download a zip file with all the material from [https://github.com/berkeley-scf/r-bootcamp-fall-2019/archive/master.zip](https://github.com/berkeley-scf/r-bootcamp-fall-2019/archive/master.zip).
 
 # What is R?
 
@@ -175,6 +175,6 @@ The building blocks of scientific computing include:
 
 # Thanks!  
 
-* To Evan, Nima, and Miyabi.
-* To Jon Stiles and D-Lab for sponsorship and logistical support.
-* To the Statewide Database/School of Law for hosting/co-sponsoring.
+* To Evan, Nima, Dana, and Miyabi.
+* To D-Lab for sponsorship and logistical support.
+* To the Statewide Database at Berkeley Law for hosting/co-sponsoring.
