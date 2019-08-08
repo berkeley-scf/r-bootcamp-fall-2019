@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>AirBears2 Access</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>If you&#39;re not able to install R and RStudio on your laptop, you can access RStudio through a web browser.</p>
+
+<p>You&#39;ll be using RStudio through a front-end interface called Jupyter that will manage starting RStudio.</p>
+
+<p>0) You need to be logged into AirBears2 or EduRoam wireless. You cannot use CalVisitor. To use AirBears2 based on your CalNet ID, see the instructions at the bottom before proceeding to the next step.</p>
+
+<p>1) Go to <a href="https://datahub.berkeley.edu/user-redirect/rstudio">https://datahub.berkeley.edu/user-redirect/rstudio</a></p>
+
+<p>2) Use your CalNet credentials to login.</p>
+
+<p>3) At this point, to make the bootcamp materials accessible to your RStudio session, you&#39;ll need to do the following:</p>
+
+<p>Within RStudio go to File-&gt;New Project-&gt;Version Control-&gt;Git and enter:</p>
+
+<ul>
+<li>&ldquo;Repository URL&rdquo;: <a href="https://github.com/berkeley-scf/r-bootcamp-fall-2019">https://github.com/berkeley-scf/r-bootcamp-fall-2019</a></li>
+<li>&ldquo;Project Directory Name&rdquo;: r-bootcamp-fall-2019 (or something else of your choosing)</li>
+<li>&ldquo;Directory&rdquo;: ~</li>
+</ul>
+
+<p>Then to update from the repository to get any changes we&#39;ve made, you can select (from within RStudio):
+Tools-&gt;Version Control-&gt;Pull Branches</p>
+
+<p>or from the Environment/History/Git window, click on the Git tab and then on the blue down arrow.</p>
+
+<p>6) To restart RStudio (e.g., if you&#39;re having a problem with R), click on the orange power button in the upper right.</p>
+
+<p>7) To end your session entirely, just kill the browser or browser tab.</p>
+
+<h3>AirBears2 Access</h3>
+
+<p>Please follow these instructions if you are trying to access AirBears2 if you have never accessed AirBears2 before.</p>
+
+<p>1) Go to <a href="https://idc.berkeley.edu/mmk">https://idc.berkeley.edu/mmk</a> and click on &ldquo;Login via CalNet&rdquo;.</p>
+
+<p>2) Login with your CalNet credentials and choose &ldquo;AirBears2&rdquo;.</p>
+
+<p>3) Select &ldquo;Set Key&rdquo; and follow the instructions.</p>
+
+<p>4) Use the key that is generated to logon to the AirBears2 wireless network. </p>
+
+</body>
+
+</html>
