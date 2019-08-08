@@ -470,35 +470,42 @@ qqnorm(mns)
 ggplot(data = gap, aes(x = lifeExp)) + geom_histogram()
 
 ## 2 ##
-ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() 
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() 
 
 ## 3 ##
-pdf('delays.pdf')
-ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + 
+pdf('readAllAboutIt.pdf', height = 5, width = 5)
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
   ggtitle("Life expectancy vs. per capita GDP") + xlab(label = "GDP per capita (dollars)") +
   ylab(label = "life expectancy (years)")
 dev.off()
-
-## 4 ##
-ggplot(data = gap, aes(x = factor(year), y = lifeExp)) + geom_boxplot()
 ```
 
 ```{r, using_the_ideas8}
+## 4 ##
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10()  +
+            facet_wrap(~continent, nrow = 2, ncol = 3)
+
+ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point(aes(size = pop)) +
+            facet_wrap(~continent, nrow = 2, ncol = 3) +
+            scale_x_continuous(limits = c(100, 50000), trans = "log10")
+
 ## 5 ##
-ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point() + facet_wrap(~year, nrow = 3, ncol = 4)
+gap %>%
+    mutate(gdpBin = cut(gdpPercap, breaks = c(0, 100, 1000, 3000, 10000, 30000, 100000))) %>% 
+    ggplot(aes(x = gdpBin, y = lifeExp)) + geom_boxplot()
 
-## 6 ##
-ggplot(data = gap, aes(x = gdpPercap, y = lifeExp, color = continent)) + geom_point() + scale_x_continuous(limits = c(100, 50000))
+gap %>% filter(gdpPercap < 100000) %>% 
+    mutate(gdpBin = cut(gdpPercap, breaks = c(0, 100, 1000, 3000, 10000, 30000, 100000))) %>% 
+    ggplot(aes(x = gdpBin, y = lifeExp)) + geom_boxplot()
 
-## 7 ##
-ggplot(data = gap, aes(x = gdpPercap, y = lifeExp, color = continent)) + geom_point() + scale_x_log10(limits = c(100, 50000))
 ```
+
 
 ```{r, advanced8}
 
 ## 6 ##
 
-## We need the alpha set for transparency so we don't hide points.
+## We need the alpha set for transparency so we don't hide points....
 
 gap %>% filter(year == 2007) %>% 
     ggplot(aes(x = gdpPercap, y = lifeExp, size = pop)) +
@@ -515,8 +522,10 @@ gap %>% filter(year == 2007) %>%
             theme(panel.grid = element_blank(), axis.line = element_line(), panel.background = element_blank())
 
 
-## Unless we figure out some way to make sure points are overlaid from largest to smallest. Let's try 'arranging' from largest to smallest.
-## And using some hints found online: https://stackoverflow.com/questions/19506630/control-point-border-thickness-in-ggplot)
+## Unless we figure out some way to make sure points are overlaid
+## from largest to smallest. Let's try 'arranging' from largest to smallest.
+## And using some hints found online:
+## https://stackoverflow.com/questions/19506630/control-point-border-thickness-in-ggplot)
 
 
 gap %>% filter(year == 2007) %>% arrange(desc(pop)) %>% 
@@ -534,6 +543,7 @@ gap %>% filter(year == 2007) %>% arrange(desc(pop)) %>%
 
 
 ## 7 ##
+
 ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point(alpha = 0.3) + geom_smooth(method = "loess", color = 'red', se = FALSE)  + scale_x_log10(limits = c(100, 50000)) + facet_wrap(~year, nrow = 3) + theme_bw()
 ```
 

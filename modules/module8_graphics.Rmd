@@ -448,11 +448,12 @@ library(gridExtra)
 
 # Create 3 plots to combine in a table
 plot1 <- ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) +
-  geom_point() + scale_x_log10()
+  geom_point() + scale_x_log10() + annotate('text', 150, 80, label = '(a)')
 plot2 <- ggplot(data = gap2007, aes(x = pop, y = lifeExp)) +
-  geom_point() + scale_x_log10()
+  geom_point() + scale_x_log10() + annotate('text', 1.8e5, 80, label = '(b)')
 plot3 <- ggplot(data = gap, aes(x = year, y = lifeExp)) +
-      geom_line(aes(color = country), show.legend = FALSE)
+      geom_line(aes(color = country), show.legend = FALSE) +
+      annotate('text', 1951, 80, label = '(c)')
 
 
 # Call grid.arrange
