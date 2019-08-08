@@ -125,23 +125,28 @@ vals[c(rep(TRUE, 3), rep(FALSE, 2), TRUE)]
 #######################################################################
 ## IMPORTANT: read in the Gapminder dataset from disk;
 ## first make sure your working directory is the 'modules' directory
+
 getwd()
-## if the result is not the 'modules' subdirectory of the bootcamp
-## directory, set the working directly along the lines of this:
+
+## if the result is not the 'modules' subdirectory of the bootcamp materials
+## directory, set the working directly along the lines of this (on a Mac):
 ##
-## setwd('/Users/paciorek/Desktop/r-bootcamp-winter-2019/modules')
+## setwd('/Users/paciorek/Desktop/r-bootcamp-fall-2019/modules')
 ##
-## replace '/Users/paciorek/Desktop' with whatever directory you put the bootcamp
-## materials in; e.g. on Windows it might be something like
-## 'C:\\Users\\sarah\\r-bootcamp-winter-2019\\modules'
+## replace '/Users/paciorek/Desktop' with whatever directory you put the R part of the Bridge
+## materials in.
+## On Windows, it would look somethign like this:
+## setwd('C:\\Users\\sarah\\r-bootcamp-fall-2019\\modules')
 ##
 ## If you've done that correctly, then the next command reads
 ## in the dataset from the 'data' directory. In the next
 ## command R finds that directory relative to the current
 ## working directory.
+
 gap <- read.csv("../data/gapminder-FiveYearData.csv",
           stringsAsFactors = FALSE)
 #######################################################################
+
 
 ## create a simple vector from the Gapminder dataset
 gdp <- gap$gdpPercap
