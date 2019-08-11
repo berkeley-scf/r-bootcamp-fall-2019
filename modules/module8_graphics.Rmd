@@ -3,6 +3,8 @@
 % Dana Seidel (built off of material by Kellie Ottoboni and Chris Krogslund)
 
 ```{r chunksetup, include=FALSE}
+knitr::opts_chunk$set(fig.cap = " ", warning=FALSE, fig.show = "hold")
+
 # include any code here you don't want to show up in the document,
 # e.g. package and dataset loading
 library(dplyr)
@@ -41,8 +43,6 @@ Additional parameters can be passed in to customize the plot:
 
 More layers can be added to the plot with additional calls to `lines`, `points`, `text`, etc.
 
-
-
 ```{r, fig.cap = ""}
 gapChina <- gap %>% filter(country == "China")
 plot(gapChina$year, gapChina$gdpPercap)
@@ -68,7 +68,7 @@ barplot(gapChina$pop, width = 4, names.arg = gapChina$year,
 
 # Object-oriented plots
 * Base graphics often recognizes the object type and will implement specific plot methods
-* lattice and ggplot2 generally **don't** exhibit this sort of behavior
+* `lattice` and `ggplot2` generally **don't** exhibit this sort of behavior
 
 ```{r, fig.cap=" "}
 gap_lm <- lm(lifeExp ~ log(gdpPercap) + year, data = gap)
@@ -80,7 +80,7 @@ plot(gap[,c('pop','lifeExp','gdpPercap')])
 plot(gap_lm, which=1:2)
 ```
 
-# Pros/cons of base graphics, ggplot2, and lattice
+# Pros/cons of base graphics, `ggplot2`, and `lattice`
 
 Base graphics is
 
@@ -104,15 +104,15 @@ d) able to interface with maps
 
 `lattice` is
 
-a) faster than ggplot2 (though only noticeable over many and large plots)
+a) faster than `ggplot2` (though only noticeable over many and large plots)
 
-b) simpler than ggplot2 (at first)
+b) simpler than `ggplot2` (at first)
 
-c) better at trellis graphs than ggplot2
+c) better at trellis graphs than `ggplot2`
 
 d) able to do 3d graphs
 
-We'll focus on ggplot2 as it is very powerful, very widely-used and allows one to produce very nice-looking graphics without a lot of coding.
+We'll focus on `ggplot2` as it is very powerful, very widely-used and allows one to produce very nice-looking graphics without a lot of coding.
 
 
 # Basic usage: `ggplot2`
@@ -129,6 +129,7 @@ Note that `ggplot2` graphs in layers in a *continuing call* (hence the endless +
 ```{r, eval=FALSE}
 ... + geom_xxxx(data = , aes(x = , y = ,[options]), [options]) + ... + ... + ...
 ```
+
 You can see the layering effect by comparing the same graph with different colors for each layer
 
 ```{r, fig.cap=" ", warning=FALSE}
@@ -139,6 +140,14 @@ p + geom_point(aes(x = year, y = lifeExp), color = "gray") + ylab("life expectan
     theme_minimal()
 ```
 
+And, if you're desperate for the quick and dirty functionality of base plot, or just like the more familiar syntax at first, `ggplot2` offers the `qplot()` function
+as a wrapper for most basic plots:
+
+```{r}
+qplot(x = year, y = lifeExp, data = gapChina)
+qplot(x = year, y = lifeExp, data = gapChina, geom = "line")
+```
+
 # Grammar of Graphics
 
 `ggplot2` syntax is very different from base graphics and lattice. It's built on the **grammar of graphics**.
@@ -146,13 +155,18 @@ The basic idea is that the visualization of all data requires four items:
 
 1) One or more **statistics** conveying information about the data (identities, means, medians, etc.)
 
-2) A **coordinate system** that differentiates between the intersections of statistics (at most two for `ggplot`, three for `lattice`)
+2) A **coordinate system** that differentiates between the intersections of statistics (at most two for ggplot, three for `lattice`)
 
 3) **Geometries** that differentiate between off-coordinate variation in *kind*
 
 4) **Scales** that differentiate between off-coordinate variation in *degree*
 
-`ggplot2` allows the user to manipulate all four of these items.
+`ggplot2` allows the user to manipulate all four of these items through the
+`stat_*`, `coord_*`, `geom_*`, and `scale_*` functions.
+
+All of these are important to *truly* becoming a `ggplot2` master `r emo::ji("wizard")` `r emo::ji("wink")`, but today we are going to focus on the most important to basic users and their data layers: `ggplot2`'s *geometries*
+
+### Some Examples
 
 ```{r, warning = FALSE, message = FALSE, fig.cap = ""}
 # Scatterplot
@@ -173,7 +187,7 @@ ggplot(gap2007, aes(x = lifeExp)) + geom_histogram(binwidth = 5) +
 
 # `ggplot2` and tidy data
 
-* `ggplot2` plays nice with `dplyr` and pipes. If you want to manipulate your data specifically for one plot but not save the new dataset, you can call your `dplyr` chain and pipe it directly into a `ggplot` call.
+* `ggplot2` plays nice with `dplyr` and pipes. If you want to manipulate your data specifically for one plot but not save the new dataset, you can call your `dplyr` chain and pipe it directly into a ggplot call.
 
 ```{r, fig.cap = "", fig.show = "hold"}
 # This combines the subsetting and plotting into one step
@@ -184,7 +198,7 @@ gap %>% filter(year == 2007) %>%
 
 * Base graphics/lattice and `ggplot2` have one big difference: `ggplot2` **requires** your data to be in tidy format. For base graphics, it can actually be helpful *not* to have your data in tidy format.
 
-For example, here `ggplot` treats `country` as an aesthetic parameter that differentiates groups of values, whereas base graphics treats each (year, medal) pair as a set of inputs to the plot.
+For example, here ggplot treats `country` as an aesthetic parameter that differentiates groups of values, whereas base graphics treats each (year, medal) pair as a set of inputs to the plot.
 
 Here's ggplot with the data in a tidy format.
 
@@ -208,9 +222,16 @@ plot(gap_wide$year, gap_wide$China, col = 'red', type = 'l', ylim = c(40, 85))
 lines(gap_wide$year, gap_wide$Turkey, col = 'green')
 lines(gap_wide$year, gap_wide$Italy, col = 'blue')
 legend("right", legend = c("China", "Turkey", "Italy"),
-                fill = c("red", "green", "blue"))
+                fill = c("red", "blue", "green"))
 ```
 
+Of course, as mentioned above, you can always filter your tidy data to replicate this plot with `ggplot2`... 
+```{r}
+gap %>%
+  filter(country %in% c("China", "Turkey", "Italy")) %>%
+  ggplot(aes(x = year, y = lifeExp)) +
+  geom_line(aes(color = country))
+```
 
 # Pros/cons of `ggplot2`
 
@@ -220,25 +241,25 @@ legend("right", legend = c("China", "Turkey", "Italy"),
 * Syntax is different from base R -- there is a learning curve
 * Plots are actually objects. You can assign them to a variable and do things with it (more on this later)
 
-# An overview of syntax for various `ggplot2` plots
+# An overview of syntax for various `ggplot2` geoms
 
 We've already seen these initial ones.
 
-X-Y scatter plots:
+X-Y scatter plots: `geom_point()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 ggplot(gapChina, aes(x = year, y = lifeExp)) + geom_point() +
                           ggtitle("China's life expectancy")
 ```
 
-X-Y line plots: 
+X-Y line plots: `geom_line()` or `geom_path()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 ggplot(gapChina, aes(x = year, y = lifeExp)) + geom_line() +
                           ggtitle("China's life expectancy")
 ```
 
-Histograms:
+Histograms: `geom_histogram()`, `geom_col()`, or `geom_bar()`
 
 ```{r, fig.cap=""}
 gap2007 <- gap %>% filter(year == 2007)
@@ -246,14 +267,14 @@ ggplot(gap2007, aes(x = lifeExp)) + geom_histogram(binwidth = 5) +
                           ggtitle("World's life expectancy")
 ```
 
-Densities:
+Densities: `geom_density()`, `geom_density2d()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 ggplot(gap2007, aes(x = lifeExp)) + geom_density() + 
                           ggtitle("World's life expectancy")
 ```
 
-Boxplots:
+Boxplots: `geom_boxplot()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 # Notice that here, you must explicitly convert numeric years to factors
@@ -261,15 +282,14 @@ ggplot(data = gap, aes(x = factor(year), y = lifeExp)) +
             geom_boxplot() 
 ```
 
-
-"Trellis" plots:
-
+"Trellis" plots: `facet_grid()` or `facet_wrap()`
+ 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 ggplot(data = gap, aes(x = lifeExp)) + geom_histogram(binwidth = 5) +
             facet_wrap(~year)
 ```
 
-Contour plots:
+Contour plots: `geom_contour()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 data(volcano) # Load volcano contour data
@@ -282,11 +302,37 @@ ggplot(data = volcano3d, aes(x = xvar, y = yvar, z = zvar)) +
             geom_contour() 
 ```
 
-tile/image/level plots:
+tile/image/level plots, heatmaps: `geom_tile()`, `geom_rect()`, `geom_raster()`
 
 ```{r, fig.cap=" ", warning=FALSE, fig.show = "hold"}
 ggplot(data = volcano3d, aes(x = xvar, y = yvar, z = zvar)) +
             geom_tile(aes(fill = zvar)) 
+```
+
+# Fitted lines and curves with `ggplot2`
+
+```{r, fig.cap=" ", warning=FALSE, message=FALSE}
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10()
+
+# Add linear model (lm) smoother
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
+  geom_smooth(method = "lm")
+
+# Add local linear model (loess) smoother, span of 0.75 (more smoothed)
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
+  geom_smooth(method = "loess", span = .75)
+
+# Add local linear model (loess) smoother, span of 0.25 (less smoothed)
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
+  geom_smooth(method = "loess", span = .25)
+
+# Add linear model (lm) smoother, no standard error shading
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
+  geom_smooth(method = "lm", se = FALSE)
+
+# Add local linear model (loess) smoother, no standard error shading
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
+  geom_smooth(method = "loess", se = FALSE)
 ```
 
 # Anatomy of `aes()`
@@ -318,6 +364,9 @@ ggplot(data = gap, aes(x = year, y = lifeExp)) +
 ggplot(data = gapChina, aes(x = year, y = lifeExp)) +
             geom_line(color = "red")
 ```
+
+**Note:** Aesthetics automatically show up in your legend, parameters (those not mapped to a 
+variable in your data frame) do not!
 
 # Using aesthetics to highlight features
 
@@ -358,9 +407,49 @@ ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) +
             geom_point(aes(size = pop, color = continent)) + scale_x_log10()
 ```
 
-# Changing options in ggplot2
+### Scaling Aesthetics:
 
-`ggplot` handles options in additional layers.
+Aesthetics are handled by their very own `scale` functions which allow you to set
+the limits, breaks, tranformations, and any palletes that might determine how you want your 
+data plotted. `ggplot2` includes a number of helpful default scale functions like 
+`scale_x_log10` that can tranform your data on the fly or `scale_color_viridis` 
+which uses palettes from the `viridis` package specifically
+designed to "make plots that are pretty, better represent your data, easier to read by those with colorblindness, and print well in grey scale."
+
+For example, our data might be better represented using a log10 transformation of per capita GDP:
+```{r}
+ggplot(gap, aes(x = gdpPercap, y = lifeExp)) +
+            geom_point(aes(color = continent)) +
+  scale_x_log10()
+
+```
+
+
+And perhaps we want colors that are a little different:
+```{r}
+ggplot(gap, aes(x = gdpPercap, y = lifeExp)) +
+            geom_point(aes(color = continent)) +
+  scale_x_log10() +
+  scale_color_viridis_d()
+```
+
+Or perhaps we want to set your palettes and breaks or labels manually: 
+
+```{r}
+ggplot(gap, aes(x = gdpPercap, y = lifeExp)) +
+            geom_point(aes(color = continent)) +
+  scale_x_log10(labels = scales::dollar) +
+  scale_color_manual("Continent", 
+                     values = c("red", "blue", "green", "yellow", "#800080")) # hex codes work!
+```
+
+For more info about setting scales in `ggplot2` and for more helper functions
+consider diving into the `scales` 
+package which is the backend to much of the scales functionality in `ggplot2`
+
+# Fine tuning your plot
+
+`ggplot` handles  many plot options as additional layers.
 
 ### Labels
 
@@ -369,6 +458,13 @@ ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() +
   xlab(label = "GDP per capita") +
   ylab(label = "Life expectancy") +
   ggtitle(label = "Gapminder") 
+```
+
+Or even more simply use the `labs()` function
+
+```{r, eval = F}
+ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() +
+  labs(x = "GDP per capita", y = "Life expectancy", title = "Gapminder")
 ```
 
 ### Axis and point scales
@@ -412,31 +508,35 @@ ggplot(data = gapChina, aes(x = year, y = lifeExp)) +
             geom_line(linetype = 5, size = 2) 
 ```
 
-# Fitted lines and curves with `ggplot2`
+### Themes with `ggplot2`
 
-```{r, fig.cap=" ", warning=FALSE, message=FALSE}
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10()
+Elements of the plot *not associated with geometries* can be adjusted using ggplot
+*themes*. 
 
-# Add linear model (lm) smoother
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
-  geom_smooth(method = "lm")
+There are some "complete" themes already included with the package:
+- `theme_gray()` (the default)
+- `theme_minimal()`
+- `theme_bw()`
+- `theme_light()`
+- `theme_dark()`
+- `theme_classic()`
 
-# Add local linear model (loess) smoother, span of 0.75 (more smoothed)
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
-  geom_smooth(method = "loess", span = .75)
+But in additional to these, you can tweak just about any element of your plot's 
+appearance using the `theme()` function. 
 
-# Add local linear model (loess) smoother, span of 0.25 (less smoothed)
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
-  geom_smooth(method = "loess", span = .25)
+For instance, perhaps you want to move the legend from the left to the bottom of 
+your plot, this would be part of the plot theme. Note how you can add options to a complete theme already in the plot:
 
-# Add linear model (lm) smoother, no standard error shading
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
-  geom_smooth(method = "lm", se = FALSE)
-
-# Add local linear model (loess) smoother, no standard error shading
-ggplot(data = gap2007, aes(x = gdpPercap, y = lifeExp)) + geom_point() + scale_x_log10() +
-  geom_smooth(method = "loess", se = FALSE)
+```{r}
+gap %>%
+  filter(country %in% c("China", "Turkey", "Italy")) %>%
+  ggplot(aes(x = year, y = lifeExp)) +
+  geom_line(aes(color = country)) +
+  theme_minimal() + 
+  theme(legend.position = "bottom")
 ```
+
+* In the future, geom aesthetics [may even be themeable...](https://github.com/tidyverse/ggplot2/pull/2749)!
 
 # Combining Multiple Plots
 
@@ -491,6 +591,8 @@ plot1 / plot2 / plot3
 
 Feel free to explore more at [https://github.com/thomasp85/patchwork](https://github.com/thomasp85/patchwork).
 
+**Note:** `patchwork` is an example of a ggplot2 extension package of which there are many! One of the benefits to learning and using `ggplot2` is that there is a huge community of developers that build separate graphics packages that generally use the same syntax to extend the `ggplot2` functionality into things like animation and 3D plotting! Check them out --> http://www.ggplot2-exts.org/gallery/ 
+
 # Exporting
 
 Two basic image types:
@@ -527,7 +629,6 @@ ggsave(filename = "example.pdf", plot = plot1, scale = , width = ,
        height = )
 ```
 
-
 # Breakout
 
 These questions ask you to work with the gapminder dataset.
@@ -551,5 +652,3 @@ These questions ask you to work with the gapminder dataset.
 6) Using the data for 2007, recreate as much as you can of [this famous Gapminder plot](https://s3-eu-west-1.amazonaws.com/static.gapminder.org/GapminderMedia/wp-uploads/20161019161829/screenshot2016.jpg), where the colors are different continents. (Don't worry about the '2015' in the background and ignore the 'play' button at the bottom.)
 
 7) Create a "trellis" plot where, for a given year, each panel uses a) hollow circles to plot lifeExp as a function of log(gdpPercap), and b) a red loess smoother without standard errors to plot the trend. Turn off the grey background. Figure out how to use partially-transparent points to reduce the effect of the overplotting of points.
-
-
