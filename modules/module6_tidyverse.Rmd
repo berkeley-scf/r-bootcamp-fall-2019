@@ -103,7 +103,11 @@ Above, we used what's called "normal" grammar, but the strengths of `dplyr` lie
 in combining several functions using *pipes*.
 
 In typical base R code, a simple operation might be written like: 
-`cupcakes <- bake(pour(mix(ingredients)))`
+
+```{r eval=F}
+# NOT run
+cupcakes <- bake(pour(mix(ingredients)))
+```
 
 A computer has no trouble understanding this and your cupcakes will be made just
 fine but a person has to read right to left to understand the order of operations 
@@ -123,6 +127,8 @@ but this can clutter our environment with a lot of variables that aren't very
 useful to us, and often are named very similar things (e.g. step, step1, step2...)
 which can lead to confusion and those hard-to-track-down bugs. 
 
+### Enter the pipe... 
+
 The *pipe* makes it easier to read code because it lays out the operations left to right 
 so each line can be read like a line of a recipe for the perfect data frame! 
 
@@ -141,6 +147,7 @@ cupcakes <- ingredients %>%
 
 **Pro Tip**: In RStudio the hotkey for the pipe is Ctrl + Shift + M. 
 
+# `select` & Pipe (`%>%`)
 Since the pipe grammar is unlike anything we've seen in R before, let's repeat what 
 we did above with the gapminder dataset using pipes:
 
@@ -550,8 +557,7 @@ head(gap_medium)
 
 `gather` and `spread` are being replaced by `pivot_longer` and `pivot_wider` in
 `tidyr 1.0.0`, which use ideas from the `cdata` package to make reshaping easier
-to think about. In a future bootcamp, we'll migrate to those functions, though 
-`gather` and `spread` are unlikely to be fully deprecated. 
+to think about. In a future bootcamp, we'll migrate to those functions.
 
 # Extra Resources
 
