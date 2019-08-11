@@ -1,6 +1,6 @@
 % R Bootcamp, Module 6: Data manipulation with the `tidyverse`
 % August 2019, UC Berkeley
-% [Nima Hejazi](https://nimahejazi.org) (based on materials developed by Kellie Ottoboni, Rochelle Terman, and Chris Krogslund)
+% Dana Seidel with materials developed by Nima Hejazi, Kellie Ottoboni, Rochelle Terman, and Chris Krogslund
 
 
 ```{r chunksetup, include=FALSE}
@@ -22,14 +22,10 @@ Thus before you can even get to doing any sort of sophisticated analysis or plot
 1. ***Manipulating*** data frames, e.g., filtering, summarizing, and conducting calculations across groups.
 2. ***Tidying*** data into the appropriate format
 
-There are two competing schools of thought within the R community.
+The [`tidyverse`](https://www.tidyverse.org/) is a suite of packages designed 
+specifically to help with both these steps; some of which we will be introducing in this module. These are by no means the only packages out there for data wrangling but they are increasingly popular for their readable, straightforward syntax and sensible default behaviors.
 
-* We should stick to the base R functions to do manipulating and tidying; `tidyverse` uses syntax that's unlike base R and is superfluous.
-* We should start teaching students to manipulate data using `tidyverse` tools because they are straightfoward to use, more readable than base R, and speed up the tidying process.
-
-We'll show you some of the `tidyverse` tools so you can make an informed decision about whether you want to use base R or these newfangled packages.
-
-# Data frame Manipulation using Base R Functions
+# Data frame Manipulation using Base R functions
 
 So far, you've seen the basics of manipulating data frames, e.g. subsetting, merging, and basic calculations.
 For instance, we can use base R functions to calculate summary statistics across groups of observations,
@@ -41,11 +37,14 @@ mean(gap[gap$continent == "Americas", "gdpPercap"])
 mean(gap[gap$continent == "Asia", "gdpPercap"])
 ```
 
-But this isn't ideal because it involves a fair bit of repetition. Repeating yourself will cost you time, both now and later, and potentially introduce some nasty bugs.
+But this isn't ideal because it involves a fair bit of repetition. 
+Repeating yourself will cost you time, both now and later, and potentially 
+introduce hard to find bugs.
 
-# Data frame Manipulation using `dplyr`
+# Data frame manipulation using `dplyr`
 
-Luckily, the [`dplyr`](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) package provides a number of very useful functions for manipulating data frames. These functions will save you time by reducing repetition. As an added bonus, you might even find the `dplyr` grammar easier to read.
+Luckily, the [`dplyr`](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf) package provides a number of very useful functions for manipulating data frames. 
+These functions will save you time and hassle by reducing repetition, and will help to make your code more human-readable (trust me: your future self and others might thank you!)
 
 Here we're going to cover 6 of the most commonly used functions as well as using pipes (`%>%`) to combine them.
 
@@ -71,7 +70,7 @@ library(dplyr)
 
 # `dplyr::select`
 
-Imagine that we just received the gapminder dataset, but are only interested in a few variables in it. We could use the `select()` function to keep only the columns corresponding to variables we select.
+Imagine that we just received the gapminder dataset, but are only interested in a few variables in it. The `select()` function can help us to keep only the columns corresponding to variables we select.
 
 ```{r}
 year_country_gdp_dplyr <- select(gap, year, country, gdpPercap)
@@ -100,16 +99,57 @@ But, as we will see, `dplyr` makes for much more readable, efficient code becaus
 
 ![](img/magrittr_hex.png)
 
-Above, we used what's called "normal" grammar, but the strengths of `dplyr` lie in combining several functions using *pipes*.
-Pipes take the input on the left side of the `%>%` symbol and pass it in as the first argument to the function on the right side.
-Since the pipe grammar is unlike anything we've seen in R before, let's repeat what we've done above using pipes.
+Above, we used what's called "normal" grammar, but the strengths of `dplyr` lie 
+in combining several functions using *pipes*.
+
+In typical base R code, a simple operation might be written like: 
+`cupcakes <- bake(pour(mix(ingredients)))`
+
+A computer has no trouble understanding this and your cupcakes will be made just
+fine but a person has to read right to left to understand the order of operations 
+- the opposite of how most western languages are read - making it harder to 
+understand what is being done! 
+
+To be more readable without pipes, we might break up this code into intermediate objects... 
+
+```{r, eval = F}
+## NOT run
+batter <- mix(ingredients)
+muffin_tin <- pour(batter)
+cupcakes <- bake(muffin_tin)
+```
+
+but this can clutter our environment with a lot of variables that aren't very 
+useful to us, and often are named very similar things (e.g. step, step1, step2...)
+which can lead to confusion and those hard-to-track-down bugs. 
+
+The *pipe* makes it easier to read code because it lays out the operations left to right 
+so each line can be read like a line of a recipe for the perfect data frame! 
+
+Pipes take the input on the left side of the `%>%` symbol and pass it in as the 
+first argument to the function on the right side.
+
+With pipes, our cupcake example might be written like:
+
+```{r, eval=F}
+## NOT run
+cupcakes <- ingredients %>% 
+  mix() %>% 
+  pour() %>% 
+  bake()
+```
+
+**Pro Tip**: In RStudio the hotkey for the pipe is Ctrl + Shift + M. 
+
+Since the pipe grammar is unlike anything we've seen in R before, let's repeat what 
+we did above with the gapminder dataset using pipes:
 
 ```{r}
 year_country_gdp <- gap %>% select(year, country, gdpPercap)
 ```
 
-First we summon the gapminder dataframe and pass it on to the next step using the pipe symbol `%>%`
-The second steps is the `select()` function.
+First, we summon the gapminder data frame and pass it on to the next step using the pipe symbol `%>%`.
+The second step is the `select()` function.
 In this case we don't specify which data object we use in the call to `select()` since we've piped it in.
 
 **Fun Fact**: There is a good chance you have encountered pipes before in the shell. In R, a pipe symbol is `%>%` while in the shell it is `|.` But the concept is the same!
@@ -170,13 +210,11 @@ The abstract problem we're encountering here is know as "split-apply-combine":
 
 We want to *split* our data into groups (in this case continents), *apply* some calculations on each group, then  *combine* the results together afterwards.
 
-Module 4 gave some ways to do split-apply-combine type stuff using the `apply` family of functions, but those are error prone and messy.
-
-Luckily, `dplyr` offers a much cleaner, straight-forward solution to this problem.
+Module 4 gave some ways to do split-apply-combine type operations using the `apply` family of functions, but `dplyr` offers a cleaner, more straight-forward solution to this problem specifically for data frames.
 
 ```{r}
-# remove this column -- there are two easy ways!
-gap <- gap %>% select(-mean.continent.GDP)
+# Want to remove the column we just made? -- there are two easy ways!
+gap <- gap %>% select(-mean.continent.GDP) # drop a column with - 
 # OR
 gap$mean.continent.GDP <- NULL
 ```
@@ -192,7 +230,7 @@ A `grouped_df` can be thought of as a `list` where each item in the `list` is a 
 # `dplyr::summarize`
 
 `group_by()` on its own is not particularly interesting.
-It's much more exciting used in conjunction with the `summarize()` function.
+It's much more exciting used in conjunction with the `summarize()` function. 
 This will allow use to create new variable(s) by applying transformations to variables in each of the continent-specific data frames.
 In other words, using the `group_by()` function, we split our original data frame into multiple pieces, which we then apply summary functions to (e.g. `mean()` or `sd()`) within `summarize()`.
 The output is a new data frame reduced in size, with one row per group.
@@ -261,11 +299,11 @@ head(gdp_pop_bycontinents_byyear)
 It can be confusing to decide whether to use `mutate` or `summarize`. The key distinction is whether you want the output to have one row for each group or one row for each row in the original data frame:
 
   - `mutate`: creates new columns with as many rows as the original data frame
-  - `summarize`: creates a dataframe with as many rows as groups
+  - `summarize`: creates a data frame with as many rows as groups
 
-Note that if you use an aggregation function such as `mean()` within `mutate()` without using `groupby()`, you'll simply do the summary over all the rows of the input dataframe.
+Note that if you use an aggregation function such as `mean()` within `mutate()` without using `groupby()`, you'll simply do the summary over all the rows of the input data frame.
 
-And if you use an aggregation function such as `mean()` within `summarize()` without using `groupby()`, you'll simply create an output dataframe with one row (i.e., the whole input dataframe is a single group).
+And if you use an aggregation function such as `mean()` within `summarize()` without using `groupby()`, you'll simply create an output data frame with one row (i.e., the whole input data frame is a single group).
 
 # `dplyr::arrange`
 
@@ -278,7 +316,7 @@ gap_with_extra_vars <- gap %>%
               sd_gdpPercap = sd(gdpPercap),
               mean_pop = mean(pop),
               sd_pop = sd(pop)) %>%
-    arrange(desc(year), continent)
+    arrange(desc(year), continent) # `desc()` puts things ins descending order
 head(gap_with_extra_vars)
 ```
 
@@ -296,21 +334,22 @@ gap_with_extra_vars <- arrange(
       ),
     desc(year), continent)
 ```
-* Facilitates split-apply-combine manipulations
+* Facilitates split-apply-combine manipulations for data frames
 
 # dplyr and "non-standard evaluation"
 
-You may run across the term "non-standard evaluation". The use of dataframe variables without quotes around them is an example of this.
+You may run across the term "non-standard evaluation". 
+The use of data frame variables without quotes around them is an example of this.
 
 Why is this strange?
 
 ```{r, eval = FALSE}
-gap %>% select(continent, year)  %>% tail()
+gap %>% select(continent, year) %>% tail()
 ```
 
 Compare it to:
 
-```{r}
+```{r, eval = F}
 gap[ , c('continent', 'year')]
 gap[ , continent]
 ```
@@ -319,7 +358,7 @@ Because `continent` and `year` are not variables our current environment! dplyr 
 
 This is fine if you have a data analysis workflow but if you want to write a function that, for example, selects an arbitrary set of columns, you'll run into trouble.
 
-```{r}
+```{r, eval = F}
 ## here's a helper function that computes the mean of a variable, stratifying by a grouping variable
 grouped_mean <- function(data, group_var, summary_var) {
   data %>%
@@ -330,7 +369,7 @@ gap %>% grouped_mean(continent, lifeExp)
 gap %>% grouped_mean('continent', 'lifeExp')
 ```
 
-See the `rlang` or  `seplyr` packages for how one can deal with this problem in this context of using functions.
+See the `rlang` or `seplyr` packages for how one can deal with this problem in this context of using functions. 
 
 # Tidying Data
 
@@ -345,7 +384,7 @@ Tidy data is easier to work with, because you have a consistent way of referring
 
 For more on the concept of *tidy* data, read Hadley Wickham's paper [here](http://vita.had.co.nz/papers/tidy-data.html)
 
-# Tidying Data/Wide vs. Long Formats
+## Wide vs. Long Formats
 
 > "Tidy datasets are all alike but every messy dataset is messy in its own way." – Hadley Wickham
 
@@ -370,9 +409,9 @@ long
 
 **Question**: Which one of these do you think is the *tidy* format?
 
-**Answer**: The first dataframe (the "wide" one) would not be considered *tidy* because values (i.e., heartrate) are spread across multiple columns.
+**Answer**: The first data frame (the "wide" one) would not be considered *tidy* because values (i.e., heartrate) are spread across multiple columns.
 
-We often refer to these different structurs as "long" vs. "wide" formats. In the "long" format, you usually have 1 column for the observed variable and the other columns are ID variables.
+We often refer to these different structures as "long" vs. "wide" formats. In the "long" format, you usually have 1 column for the observed variable and the other columns are ID variables.
 
 For the "wide" format each row is often a site/subject/patient and you have multiple observation variables containing the same type of data. These can be either repeated observations over time, or observation of multiple variables (or a mix of both). In the above case, we had the same kind of data (heart rate) entered across 3 different columns, corresponding to three different time periods.
 
@@ -382,7 +421,7 @@ You may find data input may be simpler and some programs/functions may prefer th
 
 # Tidying the Gapminder Data
 
-Lets look at the structure of our original gapminder dataframe:
+Lets look at the structure of our original gapminder data frame:
 
 ```{r}
 head(gap)
@@ -509,18 +548,30 @@ head(gap_medium)
 
 # What we just told you will become obsolete...
 
-`gather` and `spread` are being replaced by `pivot_longer` and `pivot_wider`, which use ideas from the `cdata` package to make reshaping easier to think about. In a future bootcamp, we'll migrate to those functions...
+`gather` and `spread` are being replaced by `pivot_longer` and `pivot_wider` in
+`tidyr 1.0.0`, which use ideas from the `cdata` package to make reshaping easier
+to think about. In a future bootcamp, we'll migrate to those functions, though 
+`gather` and `spread` are unlikely to be fully deprecated. 
 
 # Extra Resources
 
-`dplyr` and `tidyr` have many more functions to help you wrangle and manipulate your data. See the  [Data Wrangling Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) for more.
+`dplyr` and `tidyr` have many more functions to help you wrangle and manipulate 
+your data. See the  [Data Wrangling Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf) for more.
 
 There are some other useful packages in the [tidyverse](http://www.tidyverse.org):
 
 * `ggplot2` for plotting (I'll cover this in module 8)
-* `readr` and `haven` for reading in data with structure other than csv
+* `readr` and `haven` for reading in data
+* `purrr` for working with lists and operations similar to the `apply` family introduced in Module 4. 
 * `stringr`, `lubridate`, `forcats` for manipulating strings, dates, and factors, respectively
-* many more!
+* many many more! Take a peak at the [tidyverse github page](https://github.com/tidyverse)...
+
+**Pro Tip:** To install and load the core tidyverse packages (includes `tidyr`, `dplyr`, and `ggplot2`, among others), try:
+```{r, eval = F}
+## NOT run
+install.packages("tidyverse")
+library(tidyverse)
+```
 
 # Breakout
 
@@ -530,7 +581,7 @@ There are some other useful packages in the [tidyverse](http://www.tidyverse.org
 
 2. Use `dplyr` to add a column to the gapminder dataset that contains the total population of the continent of each observation in a given year. For example, if the first observation is Afghanistan in 1952, the new column would contain the population of Asia in 1952.
 
-3. Use `dplyr` to add a column called `gdpPercap_diff` that contains the difference between the observation's `gdpPercap` and the mean `gdpPercap` of the continent in that year. Arrange the dataframe by the column you just created, in descending order (so that the relatively richest country/years are listed first)
+3. Use `dplyr` to add a column called `gdpPercap_diff` that contains the difference between the observation's `gdpPercap` and the mean `gdpPercap` of the continent in that year. Arrange the data frame by the column you just created, in descending order (so that the relatively richest country/years are listed first)
 
 ### `tidyr`
 
