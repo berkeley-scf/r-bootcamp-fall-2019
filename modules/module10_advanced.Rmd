@@ -137,7 +137,9 @@ R6 classes are a somewhat new feature in R that provides object oriented program
 
 Here's an extended example that simulates random time series. 
 
-```{r}
+```{r, fig.cap = "", fig.width = 7}
+library(R6)
+
 tsSimClass <- R6Class("tsSimClass",
     ## class for holding time series simulators
     public = list(
@@ -200,7 +202,6 @@ tsSimClass$set("public", "simulate", function() {
     return(private$mean + crossprod(private$U, rnorm(private$n)))
 })
 
-## @knitr R6use, fig.width=7
 master <- tsSimClass$new(1:100, 2, 1)
 master
 set.seed(1)
@@ -454,6 +455,8 @@ popularR <- dbGetQuery(db, "select * from questions join questions_tags
    on questions.questionid = questions_tags.questionid
    where viewcount > 10000 and
    tag = 'r'")
+
+dbDisconnect(db)
 ```
 
 # Computer architecture
@@ -540,7 +543,7 @@ Some things that are not EP (at least not in a basic formulation):
 
 # Using multiple cores for EP problems: parallel *apply* using `future`
 
-The `future` package provides a lot of nice features for parallelization. We'll just scratch the surface here to parallelize operations over the elements of a list (note that this is essentially equivalent to `parLapply` and `mclapply`.
+The `future` package provides a lot of nice features for parallelization. We'll just scratch the surface here to parallelize operations over the elements of a list (note that this is essentially equivalent to `parLapply` and `mclapply`).
 
 First, make sure your computations on the elements are independent of each other and don't involve sequential calculations!
 
@@ -561,10 +564,9 @@ library(future.apply)
 nCores <- 4
 plan(multisession, workers = nCores)  
 out <- future_lapply(unique(air$Dest), fitFun)
+out[[1]]
+out[[81]]
 ```
-
-[CHECK IF THIS IS TRUE]
-Note there may be  errors in the HTML output from the code below, but the code should work when running it directly.
 
 Note that the `plan` statement determines how the parallelization is done behind the scenes. As shown here, it will start up workers locally on your computer, but if you have access to a cluster, you can modify the plan to make use of multiple compute nodes in a cluster.
 

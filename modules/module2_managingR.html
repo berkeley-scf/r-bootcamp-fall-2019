@@ -364,9 +364,9 @@ ls()
 ## [16] &quot;f.identity&quot;       &quot;f.invlogit&quot;       &quot;f.logit&quot;         
 ## [19] &quot;f.logmatern.euc&quot;  &quot;f.lonlat2eucl&quot;    &quot;f.matern.ang&quot;    
 ## [22] &quot;f.matern.ang.cov&quot; &quot;f.matern.euc&quot;     &quot;f.merge&quot;         
-## [25] &quot;format_bytes&quot;     &quot;f.rdist.earth&quot;    &quot;f.sort&quot;          
-## [28] &quot;f.sort2&quot;          &quot;f.squexp&quot;         &quot;f.trimat&quot;        
-## [31] &quot;f.vecrep&quot;         &quot;getNcdf&quot;          &quot;im&quot;              
+## [25] &quot;f.rdist.earth&quot;    &quot;f.sort&quot;           &quot;f.sort2&quot;         
+## [28] &quot;f.squexp&quot;         &quot;f.trimat&quot;         &quot;f.vecrep&quot;        
+## [31] &quot;format_bytes&quot;     &quot;getNcdf&quot;          &quot;im&quot;              
 ## [34] &quot;indices&quot;          &quot;ls_sizes&quot;         &quot;machineName&quot;     
 ## [37] &quot;makePoly&quot;         &quot;module&quot;           &quot;plot.ell&quot;        
 ## [40] &quot;pmap&quot;             &quot;pmap2&quot;            &quot;pointsInPoly&quot;    
@@ -454,13 +454,13 @@ ls()
 <pre><code class="r">ls(&#39;package:stats&#39;)[1:20]
 </code></pre>
 
-<pre><code>##  [1] &quot;acf&quot;                  &quot;acf2AR&quot;               &quot;add1&quot;                
-##  [4] &quot;addmargins&quot;           &quot;add.scope&quot;            &quot;aggregate&quot;           
+<pre><code>##  [1] &quot;acf&quot;                  &quot;acf2AR&quot;               &quot;add.scope&quot;           
+##  [4] &quot;add1&quot;                 &quot;addmargins&quot;           &quot;aggregate&quot;           
 ##  [7] &quot;aggregate.data.frame&quot; &quot;aggregate.ts&quot;         &quot;AIC&quot;                 
 ## [10] &quot;alias&quot;                &quot;anova&quot;                &quot;ansari.test&quot;         
 ## [13] &quot;aov&quot;                  &quot;approx&quot;               &quot;approxfun&quot;           
-## [16] &quot;ar&quot;                   &quot;ar.burg&quot;              &quot;arima&quot;               
-## [19] &quot;arima0&quot;               &quot;arima0.diag&quot;
+## [16] &quot;ar&quot;                   &quot;ar.burg&quot;              &quot;ar.mle&quot;              
+## [19] &quot;ar.ols&quot;               &quot;ar.yw&quot;
 </code></pre>
 
 <pre><code class="r">lm &lt;- function(i) {
@@ -476,7 +476,7 @@ lm(7)
 </code></pre>
 
 <pre><code>## gap$lifeExp ~ gap$gdpPercap
-## &lt;environment: 0x36cbb00&gt;
+## &lt;environment: 0x5577b2d91aa0&gt;
 </code></pre>
 
 <pre><code class="r">stats::lm(gap$lifeExp ~ gap$gdpPercap)
@@ -534,19 +534,19 @@ ls data
 
 <pre><code class="r">getwd()  # what directory will R look in?
 # Linux/Mac specific
-setwd(&#39;~/Desktop/r-bootcamp-winter-2019&#39;) # change the working directory
+setwd(&#39;~/Desktop/r-bootcamp-fall-2019&#39;) # change the working directory
 setwd(&#39;/Users/paciorek/Desktop&#39;) # absolute path
 getwd()
-setwd(&#39;r-bootcamp-winter-2019/modules&#39;) # relative path
+setwd(&#39;r-bootcamp-fall-2019/modules&#39;) # relative path
 setwd(&#39;../tmp&#39;) # relative path, up and back down the tree
 
 # Windows - use either \\ or / to indicate directories
-# setwd(&#39;C:\\Users\\Your_username\\Desktop\\r-bootcamp-winter-2019&#39;)
-# setwd(&#39;..\\r-bootcamp-winter-2019&#39;)
+# setwd(&#39;C:\\Users\\Your_username\\Desktop\\r-bootcamp-fall-2019&#39;)
+# setwd(&#39;..\\r-bootcamp-fall-2019&#39;)
 
 # platform-agnostic
-setwd(file.path(&#39;~&#39;, &#39;Desktop&#39;, &#39;r-bootcamp-winter-2019&#39;, &#39;modules&#39;)) # change the working directory
-setwd(file.path(&#39;/&#39;, &#39;Users&#39;, &#39;paciorek&#39;, &#39;Desktop&#39;, &#39;r-bootcamp-winter-2019&#39;, &#39;modules&#39;)) # absolute path
+setwd(file.path(&#39;~&#39;, &#39;Desktop&#39;, &#39;r-bootcamp-fall-2019&#39;, &#39;modules&#39;)) # change the working directory
+setwd(file.path(&#39;/&#39;, &#39;Users&#39;, &#39;paciorek&#39;, &#39;Desktop&#39;, &#39;r-bootcamp-fall-2019&#39;, &#39;modules&#39;)) # absolute path
 getwd()
 setwd(file.path(&#39;..&#39;, &#39;data&#39;)) # relative path
 </code></pre>
@@ -635,8 +635,8 @@ dev.off()
 print(xtable(table(gap$year, gap$continent)), type = &quot;html&quot;)
 </code></pre>
 
-<pre><code>## &lt;!-- html table generated in R 3.4.3 by xtable 1.8-2 package --&gt;
-## &lt;!-- Mon Jan 14 17:24:52 2019 --&gt;
+<pre><code>## &lt;!-- html table generated in R 3.5.1 by xtable 1.8-3 package --&gt;
+## &lt;!-- Tue Aug 13 13:56:48 2019 --&gt;
 ## &lt;table border=1&gt;
 ## &lt;tr&gt; &lt;th&gt;  &lt;/th&gt; &lt;th&gt; Africa &lt;/th&gt; &lt;th&gt; Americas &lt;/th&gt; &lt;th&gt; Asia &lt;/th&gt; &lt;th&gt; Europe &lt;/th&gt; &lt;th&gt; Oceania &lt;/th&gt;  &lt;/tr&gt;
 ##   &lt;tr&gt; &lt;td align=&quot;right&quot;&gt; 1952 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt;  52 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt;  25 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt;  33 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt;  30 &lt;/td&gt; &lt;td align=&quot;right&quot;&gt;   2 &lt;/td&gt; &lt;/tr&gt;
@@ -681,7 +681,7 @@ print(xtable(table(gap$year, gap$continent)), type = &quot;html&quot;)
 
 <h3>Making changes to a repository</h3>
 
-<p>We&#39;ll go through a short example of making changes to the r-bootcamp-winter-2019 repository. In this case you don&#39;t have permission to make changes so you&#39;ll just have to follow along as I do it. However, you could start your own repository and then you&#39;d be able to do similar things.</p>
+<p>We&#39;ll go through a short example of making changes to the r-bootcamp-fall-2019 repository. In this case you don&#39;t have permission to make changes so you&#39;ll just have to follow along as I do it. However, you could start your own repository and then you&#39;d be able to do similar things.</p>
 
 <p>Note that there are <a href="https://git-scm.com/downloads/guis">graphical interfaces to Git</a> that you might want to check out, but here I&#39;m just going to do it from the command line on my Mac.</p>
 

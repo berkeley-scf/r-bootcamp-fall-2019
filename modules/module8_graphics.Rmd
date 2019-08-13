@@ -164,7 +164,7 @@ The basic idea is that the visualization of all data requires four items:
 `ggplot2` allows the user to manipulate all four of these items through the
 `stat_*`, `coord_*`, `geom_*`, and `scale_*` functions.
 
-All of these are important to *truly* becoming a `ggplot2` master `r emo::ji("wizard")` `r emo::ji("wink")`, but today we are going to focus on the most important to basic users and their data layers: `ggplot2`'s *geometries*
+All of these are important to *truly* becoming a `ggplot2` master, but today we are going to focus on the most important to basic users and their data layers: `ggplot2`'s *geometries*
 
 ### Some Examples
 

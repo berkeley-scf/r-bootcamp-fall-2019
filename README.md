@@ -2,7 +2,7 @@
 
 Materials for the August 2019 R bootcamp at UC Berkeley. See below (under the listing of files) for information about the bootcamp, including logistics, how to get the course content, and how to install the software you need for the bootcamp on your laptop.
 
-Note that the actual content of the modules is still under construction. Materials from last January's bootcamp are similar, so if you'd like to look at materials before I have finalized this site, please see you may want to view [https://github.com/berkeley-scf/r-bootcamp-winter-2019](https://github.com/berkeley-scf/r-bootcamp-winter-2019).
+All modules have been updated and are essentially what will be presented.
 
 Co-trainers: UC Berkeley Statistics, D-Lab, and the Statewide Database at Berkeley Law
 

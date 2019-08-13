@@ -109,11 +109,11 @@ If you're using R directly installed on your laptop (i.e., most of you), now (or
 
 ```{r eval=FALSE}
 install.packages(c('chron','colorspace','codetools', 'DBI','devtools',
-                   'dichromat','digest','doParallel', 'dplyr', 'fields',
-                   'foreach','ggplot2','gridExtra','gtable','inline',
-                   'iterators','knitr','labeling','lattice','lme4',
+                   'dichromat','digest','doFuture','dplyr', 'fields',
+                   'foreach','future.apply', 'ggplot2','gridExtra','gtable',
+                   'inline','iterators','knitr','labeling','lattice','lme4',
                    'mapproj','maps','munsell','proftools','proto','purrr',
-                   'rbenchmark','RColorBrewer','Rcpp','reshape2','rJava',
+                   'R6','rbenchmark','RColorBrewer','Rcpp','reshape2','rJava',
                    'RSQLite', 'scales','spam','stringr','tidyr','xlsx',
                    'xlsxjars','xtable'))
 ```
