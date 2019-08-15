@@ -326,14 +326,14 @@ system.time(trunc &lt;- ifelse(vals &gt; 0, vals, 0))
 </code></pre>
 
 <pre><code>##    user  system elapsed 
-##   0.062   0.020   0.082
+##   0.084   0.000   0.085
 </code></pre>
 
 <pre><code class="r">system.time(vals &lt;- vals * (vals &gt; 0))
 </code></pre>
 
 <pre><code>##    user  system elapsed 
-##   0.005   0.000   0.005
+##   0.004   0.000   0.005
 </code></pre>
 
 <p><strong>Question</strong>: What am I doing with <code>vals * (vals &gt; 0)</code> ? What happens behind the scenes in R?</p>
@@ -505,7 +505,7 @@ for(i in 1:n)
 </code></pre>
 
 <pre><code>##    user  system elapsed 
-##   0.034   0.000   0.035
+##   0.035   0.000   0.035
 </code></pre>
 
 <p>Here&#39;s how to pre-allocate an empty list: </p>
@@ -1182,7 +1182,7 @@ dim(gapSave)
 
 <p>3) Explain the steps of what this code is doing: <code>tmp &lt;- gap[ , -which(names(gap) == &quot;continent&quot;)]</code>.</p>
 
-<p>4) Compute the number of NAs in each column of the gapminder dataset using <code>sapply()</code> and making use of the <code>is.na()</code> function.</p>
+<p>4) Compute the number of NAs in each column of the gapminder dataset using <code>sapply()</code> and making use of the <code>is.na()</code> function. It&#39;s possible to do this without writing a function (which is a topic we&#39;ll cover in Module 5).</p>
 
 <p>5) Discretize gdpPercap into some bins and create a gdpPercap_binned variable. Count the number of values in each bin.</p>
 

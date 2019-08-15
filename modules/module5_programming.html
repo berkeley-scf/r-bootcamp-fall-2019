@@ -223,10 +223,10 @@ length(out) &lt;- length(years)
 names(out) &lt;- years
 
 for (yrIdx in seq_along(years)) {
-     # equivalently: for(i in 1:length(DestSubset))
+     # equivalently: for(i in 1:length(years))
      # n.b., seq_along(x) is better than 1:length(x), since it handles the case
      # where the length of an object is 0 or NULL more robustly.
-     sub &lt;- subset(gap, gap$year == years[i])
+     sub &lt;- subset(gap, gap$year == years[yrIdx])
      if (sum(!is.na(sub$lifeExp)) &amp;&amp; length(sub$lifeExp) &gt; 1) {
      # fit regression
        out[[yrIdx]] &lt;- lm(lifeExp ~ log(gdpPercap), data = sub)
@@ -234,29 +234,62 @@ for (yrIdx in seq_along(years)) {
        out[[yrIdx]] &lt;- NA
      }
 }
+out[[&#39;2007&#39;]]
 </code></pre>
 
-<pre><code>## Error in eval(e, x, parent.frame()): object &#39;i&#39; not found
-</code></pre>
-
-<pre><code class="r">out[[&#39;2007&#39;]]
-</code></pre>
-
-<pre><code>## NULL
+<pre><code>## 
+## Call:
+## lm(formula = lifeExp ~ log(gdpPercap), data = sub)
+## 
+## Coefficients:
+##    (Intercept)  log(gdpPercap)  
+##          4.950           7.203
 </code></pre>
 
 <pre><code class="r">summary(out[[&#39;2007&#39;]])
 </code></pre>
 
-<pre><code>## Length  Class   Mode 
-##      0   NULL   NULL
+<pre><code>## 
+## Call:
+## lm(formula = lifeExp ~ log(gdpPercap), data = sub)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -25.947  -2.661   1.215   4.469  13.115 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      4.9496     3.8577   1.283    0.202    
+## log(gdpPercap)   7.2028     0.4423  16.283   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 7.122 on 140 degrees of freedom
+## Multiple R-squared:  0.6544, Adjusted R-squared:  0.652 
+## F-statistic: 265.2 on 1 and 140 DF,  p-value: &lt; 2.2e-16
 </code></pre>
 
 <pre><code class="r">summary(out[[&#39;1952&#39;]])
 </code></pre>
 
-<pre><code>## Length  Class   Mode 
-##      0   NULL   NULL
+<pre><code>## 
+## Call:
+## lm(formula = lifeExp ~ log(gdpPercap), data = sub)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -28.9571  -5.7319   0.7517   6.5770  13.7361 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -17.8457     5.0668  -3.522 0.000578 ***
+## log(gdpPercap)   8.8298     0.6626  13.326  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 8.146 on 140 degrees of freedom
+## Multiple R-squared:  0.5592, Adjusted R-squared:  0.556 
+## F-statistic: 177.6 on 1 and 140 DF,  p-value: &lt; 2.2e-16
 </code></pre>
 
 <p>The iterations do not have to explicitly be over sequential numbers.</p>
@@ -330,7 +363,7 @@ implicit.</p>
 val
 </code></pre>
 
-<pre><code>## [1] 0.01257979
+<pre><code>## [1] -0.209871
 </code></pre>
 
 <pre><code class="r">if (val &lt; 0) {
@@ -340,7 +373,7 @@ val
 }
 </code></pre>
 
-<pre><code>## [1] &quot;val is positive&quot;
+<pre><code>## [1] &quot;val is negative&quot;
 </code></pre>
 
 <p>We can chain together <code>if</code> statements as follows.</p>
@@ -349,7 +382,7 @@ val
 val
 </code></pre>
 
-<pre><code>## [1] -1.173944
+<pre><code>## [1] 0.1294696
 </code></pre>
 
 <pre><code class="r">if (val &lt; -1) {
@@ -361,7 +394,7 @@ val
 }
 </code></pre>
 
-<pre><code>## [1] &quot;val is more than one standard deviation below the mean.&quot;
+<pre><code>## [1] &quot;val is within one standard deviation of the mean.&quot;
 </code></pre>
 
 <p>In general, the <code>{</code> brackets are only needed if you have multiple R expressions,
@@ -371,7 +404,7 @@ but R will complain when an <code>else</code> starts a line of code, so generall
 <pre><code class="r">if (val &lt; 0) print(&quot;val is negative&quot;) else print(&quot;val is positive&quot;)
 </code></pre>
 
-<pre><code>## [1] &quot;val is negative&quot;
+<pre><code>## [1] &quot;val is positive&quot;
 </code></pre>
 
 <h1>The condition in an if statement</h1>
@@ -529,7 +562,7 @@ carry out more complicated operations.</li>
 
 <h1>Writing functions</h1>
 
-<p>In module 4, we sorted the airline <code>data.frame</code>.</p>
+<p>In module 4, we sorted the gap <code>data.frame</code>.</p>
 
 <pre><code class="r">ord &lt;- order(gap$year, gap$lifeExp, decreasing = TRUE)
 ord[1:5]
@@ -544,7 +577,7 @@ ord[1:5]
 <p>How would we encapsulate that functionality generically so that
 we can apply it to other <code>data.frame</code>s (or matrices)?</p>
 
-<pre><code class="r">colSort &lt;- function(data, col1, col2) {
+<pre><code class="r">sortByCol &lt;- function(data, col1, col2) {
     # Sorts a matrix or dataframe based on two  columns
     #
     # Args:
@@ -564,7 +597,7 @@ we can apply it to other <code>data.frame</code>s (or matrices)?</p>
     return(sorted)
 }
 
-identical(gm_ord, colSort(gap, &quot;year&quot;, &quot;lifeExp&quot;))
+identical(gm_ord, sortByCol(gap, &quot;year&quot;, &quot;lifeExp&quot;))
 </code></pre>
 
 <pre><code>## [1] TRUE
@@ -581,18 +614,18 @@ then generalize once you are sure it works.</p>
 also allows one to specify default values so that the user doesn&#39;t have to
 explicitly provide all the arguments.</p>
 
-<pre><code class="r">colSort &lt;- function(data, col1 = 1, col2 = 2) {
+<pre><code class="r">sortByCol &lt;- function(data, col1 = 1, col2 = 2) {
     ord &lt;- order(data[, col1], data[, col2], decreasing=TRUE)
     sorted &lt;- data[ord, ]
     return(sorted)
 }
-identical(colSort(gap, 1, 2), colSort(gap))
+identical(sortByCol(gap, 1, 2), sortByCol(gap))
 </code></pre>
 
 <pre><code>## [1] TRUE
 </code></pre>
 
-<pre><code class="r">identical(colSort(col2 = 2, data = gap, col1 = 1), colSort(gap, 1, 2))
+<pre><code class="r">identical(sortByCol(col2 = 2, data = gap, col1 = 1), sortByCol(gap, 1, 2))
 </code></pre>
 
 <pre><code>## [1] TRUE
@@ -747,15 +780,15 @@ talk</a></p></li>
 x[ , 2]
 </code></pre>
 
-<pre><code>##  [1] 0.6787194 0.1287153 0.4924545 0.5673020 0.1510785 0.6484067 0.4187383
-##  [8] 0.5691292 0.9570254 0.2603439
+<pre><code>##  [1] 0.8188109 0.1010325 0.4739784 0.8036898 0.5555630 0.2812617 0.2683165
+##  [8] 0.8361411 0.3910611 0.8747552
 </code></pre>
 
 <pre><code class="r">&#39;[&#39;(x , , 2)
 </code></pre>
 
-<pre><code>##  [1] 0.6787194 0.1287153 0.4924545 0.5673020 0.1510785 0.6484067 0.4187383
-##  [8] 0.5691292 0.9570254 0.2603439
+<pre><code>##  [1] 0.8188109 0.1010325 0.4739784 0.8036898 0.5555630 0.2812617 0.2683165
+##  [8] 0.8361411 0.3910611 0.8747552
 </code></pre>
 
 <p>Also yes!</p>
@@ -931,15 +964,15 @@ and return an error if not. (See the help information for <code>stop()</code>.)<
 
 <p>4) Figure out what <code>invisible()</code> does and why it is useful when writing
 functions. Use <code>invisible()</code> in your function from just above or in the
-<code>colSort()</code> function.</p>
+<code>sortByCol()</code> function.</p>
 
 <h3>Advanced</h3>
 
-<p>5) Extend the <code>colSort()</code> function to handle an arbitrary number of columns on
+<p>5) Extend the <code>sortByCol()</code> function to handle an arbitrary number of columns on
 which to do the sorting. You may need to modify the functionality a bit to use
 full vectors for the sorting rather than column names.</p>
 
-<p>6) Extend the <code>colSort()</code> function so that it can take either numeric indices or
+<p>6) Extend the <code>sortByCol()</code> function so that it can take either numeric indices or
 character strings indicating columns of the input data or take entire vectors to
 use in the sorting of the input data. If information specifying columns is
 given, make sure your function carefully checks that the input refers to

@@ -212,6 +212,9 @@ gap[ , -which(names(gap) == "continent")]
 ## 4 ##
 sapply(gap, function(x) sum(is.na(x)))
 
+## or without writing a function
+colSums(sapply(gap, is.na))
+
 ## 5 ##
 range(gap$gdpPercap)
 gap$gdp_binned <- cut(gap$gdpPercap,
@@ -291,7 +294,7 @@ thresh <- function(x, threshold = 0, below = TRUE) {
 }
 
 ## 4 ##
-colSort <- function(data, col1, col2) {
+sortByCol <- function(data, col1, col2) {
     ord <- order(data[, col1], data[, col2], decreasing=TRUE)
     sorted <- data[ord, ]
     invisible(sorted)
@@ -300,14 +303,14 @@ colSort <- function(data, col1, col2) {
 
 ```{r, advanced6}
 ## 5 ##
-colSort <- function(data, ...) {
+sortByCol <- function(data, ...) {
     ord <- order(..., decreasing=TRUE)
     sorted <- data[ord, ]
     invisible(sorted)
 }
 
 ## 6 ##
-colSort <- function(data, ..., cols = NULL, decreasing = FALSE) {
+sortByCol <- function(data, ..., cols = NULL, decreasing = FALSE) {
    if(is.null(cols)) {
       ord <- order(..., decreasing = decreasing)
    } else {

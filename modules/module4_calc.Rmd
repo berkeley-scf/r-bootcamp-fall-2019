@@ -348,7 +348,7 @@ What's the deal with the `all.x` and `all.y` ?  We can tell R whether we want to
 
 3) Explain the steps of what this code is doing: `tmp <- gap[ , -which(names(gap) == "continent")]`.
 
-4) Compute the number of NAs in each column of the gapminder dataset using `sapply()` and making use of the `is.na()` function.
+4) Compute the number of NAs in each column of the gapminder dataset using `sapply()` and making use of the `is.na()` function. It's possible to do this without writing a function (which is a topic we'll cover in Module 5).
 
 5) Discretize gdpPercap into some bins and create a gdpPercap_binned variable. Count the number of values in each bin.
 
