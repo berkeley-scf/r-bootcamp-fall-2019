@@ -556,12 +556,12 @@ mod &lt;-<span class="st"> </span><span class="kw">gam</span>(lifeExp <span clas
 </div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rmultinom</span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dt">prob =</span> <span class="kw">c</span>(.<span class="dv">1</span>, <span class="fl">.1</span>, <span class="fl">.2</span>, <span class="fl">.3</span>, <span class="fl">.25</span>, <span class="fl">.05</span>)) </code></pre></div>
 <pre><code>##      [,1]
-## [1,]   10
-## [2,]   12
-## [3,]   22
-## [4,]   21
-## [5,]   24
-## [6,]   11</code></pre>
+## [1,]    6
+## [2,]   11
+## [3,]   18
+## [4,]   30
+## [5,]   31
+## [6,]    4</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dt">length =</span> <span class="dv">100</span>)
 <span class="kw">plot</span>(x, <span class="kw">dchisq</span>(x, <span class="dt">df =</span> <span class="dv">1</span>), <span class="dt">type =</span> <span class="st">'l'</span>)
 <span class="kw">lines</span>(x, <span class="kw">dchisq</span>(x, <span class="dt">df =</span> <span class="dv">2</span>), <span class="dt">col =</span> <span class="st">'red'</span>)</code></pre></div>
@@ -574,8 +574,8 @@ mod &lt;-<span class="st"> </span><span class="kw">gam</span>(lifeExp <span clas
 <h1>Other types of simulation and sampling</h1>
 <p>We can draw a sample with or without replacement.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(gap), <span class="dv">20</span>, <span class="dt">replace =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>##  [1]  449 1221 1291 1121 1376 1391  513  670  942  830  152 1292  681 1020
-## [15]  658  517  428 1441 1072 1236</code></pre>
+<pre><code>##  [1]   51 1537  618 1295    5 1525  200 1260 1039 1053  719  125 1483  740
+## [15]  636 1182 1066 1447  754  786</code></pre>
 <p>Here's an example of some code that would be part of coding up a bootstrap. As I mentioned previously, this would be a weird dataset to do formal statistical inference on given it includes most of the countries in the world, though one could think about fitting models for the variation over time, treating short-term fluctuations as random.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># actual mean</span>
 <span class="kw">mean</span>(gap<span class="op">$</span>lifeExp, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
@@ -583,7 +583,7 @@ mod &lt;-<span class="st"> </span><span class="kw">gam</span>(lifeExp <span clas
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># here's a bootstrap sample:</span>
 smp &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">seq_len</span>(<span class="kw">nrow</span>(gap)), <span class="dt">replace =</span> <span class="ot">TRUE</span>) 
 <span class="kw">mean</span>(gap<span class="op">$</span>lifeExp[smp], <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 59.80488</code></pre>
+<pre><code>## [1] 60.0459</code></pre>
 <p>It's a good idea to use <code>seq_along()</code> and <code>seq_len()</code> and not syntax like <code>1:length(gap)</code> in <code>sample()</code> because the outcome of <code>length()</code> might in some cases be unexpected (e.g., if you're taking subsets of a dataset). Similar reasoning holds when setting up for loops: e.g.,</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_len</span>(<span class="kw">nrow</span>(gap))) {
 <span class="co"># blah</span>
@@ -721,8 +721,8 @@ d2 &lt;-<span class="st"> </span><span class="kw">chron</span>(<span class="st">
 <li><p>Consider the code where we used <code>sample()</code>. Initialize a storage vector of 500 zeroes. Set up a bootstrap using a for loop, with 500 bootstrap datasets. Here are the steps within each iteration:</p></li>
 </ol>
 <ul>
-<li>resample with replacement a new dataset of the same size as the actual dataset</li>
-<li>assign the value of the mean of the delay for the bootstrap dataset into the storage vector</li>
+<li>resample with replacement a new dataset of the same size as the actual <code>gap</code> dataset</li>
+<li>assign the value of the mean of the life expectancy for the bootstrap dataset into the storage vector</li>
 <li>repeat</li>
 </ul>
 <p>Now plot a histogram of the 500 values - this is an estimate of the sampling distribution of the sample mean.</p>
