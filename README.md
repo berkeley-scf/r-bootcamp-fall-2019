@@ -23,7 +23,7 @@ No prior experience with R is expected, but some familiarity with programming co
 
 Course logistics
 
-Location: Koret 105 (UC Berkeley Law School), UC Berkeley campus ([map](https://www.google.com/maps/@37.8695779,-122.2529475,17z)).
+Location: Berkeley Law School Room 105 (UC Berkeley Law School), UC Berkeley campus ([map](https://www.google.com/maps/@37.8695779,-122.2529475,17z)).
 
 Time: 
   - Saturday, August 24, 8:15 am - 5 pm
