@@ -178,3 +178,8 @@ The building blocks of scientific computing include:
 * To Evan, Nima, Dana, and Miyabi.
 * To D-Lab for sponsorship and logistical support.
 * To the Statewide Database at Berkeley Law for hosting/co-sponsoring.
+
+# We want your feedback (even if you leave early)!
+
+During the afternoon break tomorrow, we'll ask everyone to fill out a feedback form, but if you leave early, please also fill it out:
+[https://berkeley.qualtrics.com/jfe/form/SV_3Qmh1KuwGkEDNEp](https://berkeley.qualtrics.com/jfe/form/SV_3Qmh1KuwGkEDNEp)
