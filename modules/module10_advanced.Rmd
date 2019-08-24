@@ -422,9 +422,6 @@ In Windows you might have a UNIX text file appear to be all one line. The *unix2
 
 There may also be Windows tools to deal with this. 
 
-As a side note, before Mac OS X, lines ended only in a carriage return.
-There is a UNIX utility call *mac2unix* that can convert such text files.
-
 # Working with databases
 
 R has the capability to read and write from a variety of relational database management systems (DBMS). Basically a database is a collection of rectangular format datasets (tables). Some of these tables have fields in common so it makes sense to merge (i.e., join) information from multiple tables. E.g., you might have a database with a table of student information, a table of teacher information and a table of school information. 
@@ -501,10 +498,10 @@ A 'thread' is a lightweight process, and the operating system sees multiple thre
 * For Mac, Apple's *vecLib* (in a library called *libRblas.vecLib.dylib*) is fast and threaded.
 * For Windows, you're probably out of luck.
 
-We'll show by demonstration that my Mac laptop is using multiple cores for linear algebra operations.
+We'll show by demonstration that my desktop in my office is using multiple cores for linear algebra operations.
 
 ```{r, cache=TRUE}
-# note to CJP: don't run in RStudio
+# note to CJP: don't run on laptop with slow BLAS
 n <- 5000
 x <- matrix(rnorm(n^2), n)
 U <- chol(crossprod(x))
@@ -583,7 +580,6 @@ To use multiple cores on a single machine, use the *parallel* back-end from the 
 We'll use a new dataset here, which is a dataset of airline departure times (in particular delays) for all flights from SFO over a period of several years. We'll do a stratified analysis, fitting a GAM (see Unit 7) for each of the destination airports.
 
 ```{r cache=TRUE}
-# note to CJP: don't run in RStudio
 library(parallel)
 library(doFuture)
 library(foreach)
@@ -633,10 +629,12 @@ The syntax for using L'Ecuyer is available in my [parallel computing tutorial](h
 
 If you have access to multiple machines within a networked environment, such as the compute servers in the Statistics Department or the campus-wide Savio cluster or machines on Amazon's EC2 service, there are a few (sometimes) straightforward ways to parallelize EP jobs across machines.
 
-1. Use `foreach` with *doMPI* as the back-end. You'll need *MPI* and *Rmpi* installed on all machines.
-2. Use `foreach` with *doSNOW* as the backend and start a cluster of type "SOCK" to avoid needing MPI/Rmpi. 
-3. Use sockets to make a cluster in R and then use `parLapply()`, `parSapply()`, `mclapply()`, etc.
-4. Use the *future* package.
+1. Use the *future* package (recommended).
+2. Use `foreach` with *doMPI* as the back-end. You'll need *MPI* and *Rmpi* installed on all machines.
+3. Use `foreach` with *doSNOW* as the backend and start a cluster of type "SOCK" to avoid needing MPI/Rmpi. 
+4. Use sockets to make a cluster in R and then use `parLapply()`, `parSapply()`, `mclapply()`, etc.
 
-See my [tutorial on distributed computing](https://github.com/berkeley-scf/tutorial-parallel-distributed) for syntax and more details. 
+For option 1, see my [tutorial on the future package (and also Python's dask package)](https://github.com/berkeley-scf/tutorial-dask-future) for syntax and more details.
+
+For options 2-4, see my [tutorial on distributed computing](https://github.com/berkeley-scf/tutorial-parallel-distributed) for syntax and more details. 
 

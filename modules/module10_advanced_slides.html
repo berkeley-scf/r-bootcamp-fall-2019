@@ -177,7 +177,7 @@ mod2<span class="op">$</span>residuals[<span class="dv">1</span><span class="op"
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">predict</code></pre></div>
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;predict&quot;)
-## &lt;bytecode: 0x55ba429837f8&gt;
+## &lt;bytecode: 0x5653b8a6d6e8&gt;
 ## &lt;environment: namespace:stats&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># predict.glm</span></code></pre></div>
 <p>When <code>predict()</code> is called on a GLM object, it first calls the generic <code>predict()</code>, which then recognizes that the first argument is of the class <em>glm</em> and immediately calls the right class-specific method, <code>predict.glm()</code> in this case.</p>
@@ -241,7 +241,7 @@ fm1 &lt;-<span class="st"> </span><span class="kw">lmer</span>(Reaction <span cl
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fm1<span class="op">$</span>theta</code></pre></div>
 <pre><code>## Error in fm1$theta: $ operator not defined for this S4 class</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fm1<span class="op">@</span>theta</code></pre></div>
-<pre><code>## [1] 0.96673279 0.01516906 0.23090960</code></pre>
+<pre><code>## [1] 0.96658123 0.01518653 0.23093959</code></pre>
 </div>
 <div id="a-brief-mention-of-r6-classes" class="slide section level1">
 <h1>A brief mention of R6 Classes</h1>
@@ -315,7 +315,7 @@ master &lt;-<span class="st"> </span>tsSimClass<span class="op">$</span><span cl
 <pre><code>## Loading required package: spam</code></pre>
 <pre><code>## Loading required package: dotCall64</code></pre>
 <pre><code>## Loading required package: grid</code></pre>
-<pre><code>## Spam version 2.2-1 (2018-12-20) is loaded.
+<pre><code>## Spam version 2.2-2 (2019-03-07) is loaded.
 ## Type 'help( Spam)' or 'demo( spam)' for a short introduction 
 ## and overview of this package.
 ## Help for individual functions is also obtained by adding the
@@ -329,8 +329,8 @@ master &lt;-<span class="st"> </span>tsSimClass<span class="op">$</span><span cl
 ## 
 ##     backsolve, forwardsolve</code></pre>
 <pre><code>## Loading required package: maps</code></pre>
-<pre><code>## See www.image.ucar.edu/~nychka/Fields for
-##  a vignette and other supplements.</code></pre>
+<pre><code>## See https://github.com/NCAR/Fields for
+##  an extensive vignette, other supplements and source code</code></pre>
 <pre><code>## Done updating correlation matrix and Cholesky factor.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">master</code></pre></div>
 <pre><code>## R6 Object of class 'tsSimClass' with 100 time points.</code></pre>
@@ -430,6 +430,8 @@ fakedat<span class="op">$</span>gdpPercap[fakedat<span class="op">$</span>contin
 }</code></pre></div>
 <pre><code>## Fitting model for continent  Asia .
 ## Fitting model for continent  Oceania .
+## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) : 
+##   0 (non-NA) cases
 ## Fitting model for continent  Europe .
 ## Fitting model for continent  Americas .
 ## Fitting model for continent  Africa .</code></pre>
@@ -569,7 +571,6 @@ x</code></pre></div>
 <p>So in UNIX you might see <code>^M</code> at the end of lines when you open a Windows file in a text editor. The <em>dos2unix</em> or <em>fromdos</em> in UNIX commands can do the necessary conversion</p>
 <p>In Windows you might have a UNIX text file appear to be all one line. The <em>unix2dos</em> or <em>todos</em> commands in UNIX can do the conversion.</p>
 <p>There may also be Windows tools to deal with this.</p>
-<p>As a side note, before Mac OS X, lines ended only in a carriage return. There is a UNIX utility call <em>mac2unix</em> that can convert such text files.</p>
 </div>
 <div id="working-with-databases" class="slide section level1">
 <h1>Working with databases</h1>
@@ -647,8 +648,8 @@ popularR &lt;-<span class="st"> </span><span class="kw">dbGetQuery</span>(db, <s
 <li>For Mac, Apple's <em>vecLib</em> (in a library called <em>libRblas.vecLib.dylib</em>) is fast and threaded.</li>
 <li>For Windows, you're probably out of luck.</li>
 </ul>
-<p>We'll show by demonstration that my Mac laptop is using multiple cores for linear algebra operations.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># note to CJP: don't run in RStudio</span>
+<p>We'll show by demonstration that my desktop in my office is using multiple cores for linear algebra operations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># note to CJP: don't run on laptop with slow BLAS</span>
 n &lt;-<span class="st"> </span><span class="dv">5000</span>
 x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n<span class="op">^</span><span class="dv">2</span>), n)
 U &lt;-<span class="st"> </span><span class="kw">chol</span>(<span class="kw">crossprod</span>(x))</code></pre></div>
@@ -694,48 +695,22 @@ U &lt;-<span class="st"> </span><span class="kw">chol</span>(<span class="kw">cr
 }
 
 
-<span class="kw">library</span>(future.apply)</code></pre></div>
-<pre><code>## Loading required package: future</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nCores &lt;-<span class="st"> </span><span class="dv">4</span>
+<span class="kw">library</span>(future.apply)
+nCores &lt;-<span class="st"> </span><span class="dv">4</span>
 <span class="kw">plan</span>(multisession, <span class="dt">workers =</span> nCores)  
-out &lt;-<span class="st"> </span><span class="kw">future_lapply</span>(<span class="kw">unique</span>(air<span class="op">$</span>Dest), fitFun)</code></pre></div>
-<pre><code>## Loading required package: nlme</code></pre>
-<pre><code>## This is mgcv 1.8-24. For overview type 'help(&quot;mgcv-package&quot;)'.</code></pre>
-<pre><code>## Loading required package: nlme</code></pre>
-<pre><code>## This is mgcv 1.8-24. For overview type 'help(&quot;mgcv-package&quot;)'.</code></pre>
-<pre><code>## Loading required package: nlme</code></pre>
-<pre><code>## This is mgcv 1.8-24. For overview type 'help(&quot;mgcv-package&quot;)'.</code></pre>
-<pre><code>## Loading required package: nlme</code></pre>
-<pre><code>## This is mgcv 1.8-24. For overview type 'help(&quot;mgcv-package&quot;)'.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out[[<span class="dv">1</span>]]</code></pre></div>
+out &lt;-<span class="st"> </span><span class="kw">future_lapply</span>(<span class="kw">unique</span>(air<span class="op">$</span>Dest), fitFun)
+out[[<span class="dv">1</span>]]</code></pre></div>
 <pre><code>## 
-## Call:  gam(formula = DepDelay ~ Year + s(Month) + s(Hour) + as.factor(DayOfWeek), 
-##     data = tmp)
+## Family: gaussian 
+## Link function: identity 
 ## 
-## Coefficients:
-##           (Intercept)                   Year  as.factor(DayOfWeek)2  
-##            -3497.3037                 1.7490                -2.1810  
-## as.factor(DayOfWeek)3  as.factor(DayOfWeek)4  as.factor(DayOfWeek)5  
-##               -3.6045                -1.6800                 2.9982  
-## as.factor(DayOfWeek)6  as.factor(DayOfWeek)7             s(Month).1  
-##               -2.4173                 0.7169                -8.6549  
-##            s(Month).2             s(Month).3             s(Month).4  
-##               32.1570               -12.0161                10.7049  
-##            s(Month).5             s(Month).6             s(Month).7  
-##                8.2426               -13.9619                -4.9777  
-##            s(Month).8             s(Month).9              s(Hour).1  
-##              -46.2121                14.8763                 5.6931  
-##             s(Hour).2              s(Hour).3              s(Hour).4  
-##                4.5111                 9.9465                 8.5980  
-##             s(Hour).5              s(Hour).6              s(Hour).7  
-##                1.9587                 6.1938                -0.2061  
-##             s(Hour).8              s(Hour).9  
-##               -7.0151                 2.2963  
+## Formula:
+## DepDelay ~ Year + s(Month) + s(Hour) + as.factor(DayOfWeek)
 ## 
-## Degrees of Freedom: 15782 Total (i.e. Null);  15760 Residual
-##   (142 observations deleted due to missingness)
-## Null Deviance:       17480000 
-## Residual Deviance: 16550000  AIC: 154600</code></pre>
+## Estimated degrees of freedom:
+## 7.51 7.49  total = 23 
+## 
+## GCV score: 1051.858</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">out[[<span class="dv">81</span>]]</code></pre></div>
 <pre><code>## [1] &quot;Error in smooth.construct.tp.smooth.spec(object, dk$data, dk$knots) : \n  A term has fewer unique covariate combinations than specified maximum degrees of freedom\n&quot;
 ## attr(,&quot;class&quot;)
@@ -751,19 +726,9 @@ out &lt;-<span class="st"> </span><span class="kw">future_lapply</span>(<span cl
 <p>The <em>foreach</em> package provides a way to do a for loop using multiple cores. It can use a variety of 'back-ends' that handle the nitty-gritty of the parallelization. Happily it integrates with the <code>future</code> package nicely.</p>
 <p>To use multiple cores on a single machine, use the <em>parallel</em> back-end from the <em>doParallel</em> package.</p>
 <p>We'll use a new dataset here, which is a dataset of airline departure times (in particular delays) for all flights from SFO over a period of several years. We'll do a stratified analysis, fitting a GAM (see Unit 7) for each of the destination airports.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># note to CJP: don't run in RStudio</span>
-<span class="kw">library</span>(parallel)
-<span class="kw">library</span>(doFuture)</code></pre></div>
-<pre><code>## Loading required package: globals</code></pre>
-<pre><code>## 
-## Attaching package: 'globals'</code></pre>
-<pre><code>## The following object is masked from 'package:codetools':
-## 
-##     findGlobals</code></pre>
-<pre><code>## The following object is masked from 'package:spam':
-## 
-##     cleanup</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(foreach)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(parallel)
+<span class="kw">library</span>(doFuture)
+<span class="kw">library</span>(foreach)
 
 nCores &lt;-<span class="st"> </span><span class="dv">4</span>  <span class="co"># actually only 2 on my laptop, but appears hyperthreaded</span>
 <span class="kw">registerDoFuture</span>()
@@ -1035,12 +1000,13 @@ out &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="d
 <h1>A brief note on distributed computing for advanced users</h1>
 <p>If you have access to multiple machines within a networked environment, such as the compute servers in the Statistics Department or the campus-wide Savio cluster or machines on Amazon's EC2 service, there are a few (sometimes) straightforward ways to parallelize EP jobs across machines.</p>
 <ol style="list-style-type: decimal">
+<li>Use the <em>future</em> package (recommended).</li>
 <li>Use <code>foreach</code> with <em>doMPI</em> as the back-end. You'll need <em>MPI</em> and <em>Rmpi</em> installed on all machines.</li>
 <li>Use <code>foreach</code> with <em>doSNOW</em> as the backend and start a cluster of type &quot;SOCK&quot; to avoid needing MPI/Rmpi.</li>
 <li>Use sockets to make a cluster in R and then use <code>parLapply()</code>, <code>parSapply()</code>, <code>mclapply()</code>, etc.</li>
-<li>Use the <em>future</em> package.</li>
 </ol>
-<p>See my <a href="https://github.com/berkeley-scf/tutorial-parallel-distributed">tutorial on distributed computing</a> for syntax and more details.</p>
+<p>For option 1, see my <a href="https://github.com/berkeley-scf/tutorial-dask-future">tutorial on the future package (and also Python's dask package)</a> for syntax and more details.</p>
+<p>For options 2-4, see my <a href="https://github.com/berkeley-scf/tutorial-parallel-distributed">tutorial on distributed computing</a> for syntax and more details.</p>
 </div>
 </body>
 </html>

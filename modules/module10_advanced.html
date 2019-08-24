@@ -376,29 +376,30 @@ mod2$residuals[1:20] # access field with list-like syntax
 </code></pre>
 
 <pre><code>##  [1] predict.ar*                predict.Arima*            
-##  [3] predict.arima0*            predict.bs*               
-##  [5] predict.bSpline*           predict.fastTps           
-##  [7] predict.glm                predict.glmmPQL*          
-##  [9] predict.gls*               predict.gnls*             
-## [11] predict.HoltWinters*       predict.interp.surface    
-## [13] predict.Krig               predict.lda*              
-## [15] predict.lm                 predict.lme*              
-## [17] predict.lmList*            predict.lmList4*          
-## [19] predict.loess*             predict.lqs*              
-## [21] predict.mca*               predict.merMod*           
-## [23] predict.mKrig              predict.mlm*              
-## [25] predict.nbSpline*          predict.nlme*             
-## [27] predict.nls*               predict.npolySpline*      
-## [29] predict.ns*                predict.pbSpline*         
-## [31] predict.polr*              predict.poly*             
-## [33] predict.polySpline*        predict.ppolySpline*      
-## [35] predict.ppr*               predict.prcomp*           
-## [37] predict.princomp*          predict.qda*              
-## [39] predict.qsreg              predict.rlm*              
-## [41] predict.smooth.spline*     predict.smooth.spline.fit*
-## [43] predict.sreg               predict.StructTS*         
-## [45] predict.surface            predict.surface.default   
-## [47] predict.Tps               
+##  [3] predict.arima0*            predict.bam               
+##  [5] predict.bs*                predict.bSpline*          
+##  [7] predict.fastTps            predict.gam               
+##  [9] predict.glm                predict.glmmPQL*          
+## [11] predict.gls*               predict.gnls*             
+## [13] predict.HoltWinters*       predict.interp.surface    
+## [15] predict.jam*               predict.Krig              
+## [17] predict.lda*               predict.lm                
+## [19] predict.lme*               predict.lmList*           
+## [21] predict.lmList4*           predict.loess*            
+## [23] predict.lqs*               predict.mca*              
+## [25] predict.merMod*            predict.mKrig             
+## [27] predict.mlm*               predict.nbSpline*         
+## [29] predict.nlme*              predict.nls*              
+## [31] predict.npolySpline*       predict.ns*               
+## [33] predict.pbSpline*          predict.polr*             
+## [35] predict.poly*              predict.polySpline*       
+## [37] predict.ppolySpline*       predict.ppr*              
+## [39] predict.prcomp*            predict.princomp*         
+## [41] predict.qda*               predict.qsreg             
+## [43] predict.rlm*               predict.smooth.spline*    
+## [45] predict.smooth.spline.fit* predict.sreg              
+## [47] predict.StructTS*          predict.surface           
+## [49] predict.surface.default    predict.Tps               
 ## see &#39;?methods&#39; for accessing help and source code
 </code></pre>
 
@@ -407,7 +408,7 @@ mod2$residuals[1:20] # access field with list-like syntax
 
 <pre><code>## function (object, ...) 
 ## UseMethod(&quot;predict&quot;)
-## &lt;bytecode: 0x55ba429837f8&gt;
+## &lt;bytecode: 0x5653b8a6d6e8&gt;
 ## &lt;environment: namespace:stats&gt;
 </code></pre>
 
@@ -511,7 +512,7 @@ class(fm1)
 <pre><code class="r">fm1@theta
 </code></pre>
 
-<pre><code>## [1] 0.96673279 0.01516906 0.23090960
+<pre><code>## [1] 0.96658123 0.01518653 0.23093959
 </code></pre>
 
 <h1>A brief mention of R6 Classes</h1>
@@ -744,6 +745,8 @@ for(cont in c(&#39;Asia&#39;, &#39;Oceania&#39;, &#39;Europe&#39;, &#39;Americas
 
 <pre><code>## Fitting model for continent  Asia .
 ## Fitting model for continent  Oceania .
+## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) : 
+##   0 (non-NA) cases
 ## Fitting model for continent  Europe .
 ## Fitting model for continent  Americas .
 ## Fitting model for continent  Africa .
@@ -974,9 +977,6 @@ x
 
 <p>There may also be Windows tools to deal with this. </p>
 
-<p>As a side note, before Mac OS X, lines ended only in a carriage return.
-There is a UNIX utility call <em>mac2unix</em> that can convert such text files.</p>
-
 <h1>Working with databases</h1>
 
 <p>R has the capability to read and write from a variety of relational database management systems (DBMS). Basically a database is a collection of rectangular format datasets (tables). Some of these tables have fields in common so it makes sense to merge (i.e., join) information from multiple tables. E.g., you might have a database with a table of student information, a table of teacher information and a table of school information. </p>
@@ -1074,9 +1074,9 @@ dbDisconnect(db)
 <li>For Windows, you&#39;re probably out of luck.</li>
 </ul>
 
-<p>We&#39;ll show by demonstration that my Mac laptop is using multiple cores for linear algebra operations.</p>
+<p>We&#39;ll show by demonstration that my desktop in my office is using multiple cores for linear algebra operations.</p>
 
-<pre><code class="r"># note to CJP: don&#39;t run in RStudio
+<pre><code class="r"># note to CJP: don&#39;t run on laptop with slow BLAS
 n &lt;- 5000
 x &lt;- matrix(rnorm(n^2), n)
 U &lt;- chol(crossprod(x))
@@ -1138,63 +1138,20 @@ library(future.apply)
 nCores &lt;- 4
 plan(multisession, workers = nCores)  
 out &lt;- future_lapply(unique(air$Dest), fitFun)
-</code></pre>
-
-<pre><code>## Loading required package: nlme
-</code></pre>
-
-<pre><code>## This is mgcv 1.8-24. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.
-</code></pre>
-
-<pre><code>## Loading required package: nlme
-</code></pre>
-
-<pre><code>## This is mgcv 1.8-24. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.
-</code></pre>
-
-<pre><code>## Loading required package: nlme
-</code></pre>
-
-<pre><code>## This is mgcv 1.8-24. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.
-</code></pre>
-
-<pre><code>## Loading required package: nlme
-</code></pre>
-
-<pre><code>## This is mgcv 1.8-24. For overview type &#39;help(&quot;mgcv-package&quot;)&#39;.
-</code></pre>
-
-<pre><code class="r">out[[1]]
+out[[1]]
 </code></pre>
 
 <pre><code>## 
-## Call:  gam(formula = DepDelay ~ Year + s(Month) + s(Hour) + as.factor(DayOfWeek), 
-##     data = tmp)
+## Family: gaussian 
+## Link function: identity 
 ## 
-## Coefficients:
-##           (Intercept)                   Year  as.factor(DayOfWeek)2  
-##            -3497.3037                 1.7490                -2.1810  
-## as.factor(DayOfWeek)3  as.factor(DayOfWeek)4  as.factor(DayOfWeek)5  
-##               -3.6045                -1.6800                 2.9982  
-## as.factor(DayOfWeek)6  as.factor(DayOfWeek)7             s(Month).1  
-##               -2.4173                 0.7169                -8.6549  
-##            s(Month).2             s(Month).3             s(Month).4  
-##               32.1570               -12.0161                10.7049  
-##            s(Month).5             s(Month).6             s(Month).7  
-##                8.2426               -13.9619                -4.9777  
-##            s(Month).8             s(Month).9              s(Hour).1  
-##              -46.2121                14.8763                 5.6931  
-##             s(Hour).2              s(Hour).3              s(Hour).4  
-##                4.5111                 9.9465                 8.5980  
-##             s(Hour).5              s(Hour).6              s(Hour).7  
-##                1.9587                 6.1938                -0.2061  
-##             s(Hour).8              s(Hour).9  
-##               -7.0151                 2.2963  
+## Formula:
+## DepDelay ~ Year + s(Month) + s(Hour) + as.factor(DayOfWeek)
 ## 
-## Degrees of Freedom: 15782 Total (i.e. Null);  15760 Residual
-##   (142 observations deleted due to missingness)
-## Null Deviance:       17480000 
-## Residual Deviance: 16550000  AIC: 154600
+## Estimated degrees of freedom:
+## 7.51 7.49  total = 23 
+## 
+## GCV score: 1051.858
 </code></pre>
 
 <pre><code class="r">out[[81]]
@@ -1221,29 +1178,9 @@ out &lt;- future_lapply(unique(air$Dest), fitFun)
 
 <p>We&#39;ll use a new dataset here, which is a dataset of airline departure times (in particular delays) for all flights from SFO over a period of several years. We&#39;ll do a stratified analysis, fitting a GAM (see Unit 7) for each of the destination airports.</p>
 
-<pre><code class="r"># note to CJP: don&#39;t run in RStudio
-library(parallel)
+<pre><code class="r">library(parallel)
 library(doFuture)
-</code></pre>
-
-<pre><code>## Loading required package: globals
-</code></pre>
-
-<pre><code>## 
-## Attaching package: &#39;globals&#39;
-</code></pre>
-
-<pre><code>## The following object is masked from &#39;package:codetools&#39;:
-## 
-##     findGlobals
-</code></pre>
-
-<pre><code>## The following object is masked from &#39;package:spam&#39;:
-## 
-##     cleanup
-</code></pre>
-
-<pre><code class="r">library(foreach)
+library(foreach)
 
 nCores &lt;- 4  # actually only 2 on my laptop, but appears hyperthreaded
 registerDoFuture()
@@ -1538,13 +1475,15 @@ rnorm(5)
 <p>If you have access to multiple machines within a networked environment, such as the compute servers in the Statistics Department or the campus-wide Savio cluster or machines on Amazon&#39;s EC2 service, there are a few (sometimes) straightforward ways to parallelize EP jobs across machines.</p>
 
 <ol>
+<li>Use the <em>future</em> package (recommended).</li>
 <li>Use <code>foreach</code> with <em>doMPI</em> as the back-end. You&#39;ll need <em>MPI</em> and <em>Rmpi</em> installed on all machines.</li>
 <li>Use <code>foreach</code> with <em>doSNOW</em> as the backend and start a cluster of type &ldquo;SOCK&rdquo; to avoid needing MPI/Rmpi. </li>
 <li>Use sockets to make a cluster in R and then use <code>parLapply()</code>, <code>parSapply()</code>, <code>mclapply()</code>, etc.</li>
-<li>Use the <em>future</em> package.</li>
 </ol>
 
-<p>See my <a href="https://github.com/berkeley-scf/tutorial-parallel-distributed">tutorial on distributed computing</a> for syntax and more details. </p>
+<p>For option 1, see my <a href="https://github.com/berkeley-scf/tutorial-dask-future">tutorial on the future package (and also Python&#39;s dask package)</a> for syntax and more details.</p>
+
+<p>For options 2-4, see my <a href="https://github.com/berkeley-scf/tutorial-parallel-distributed">tutorial on distributed computing</a> for syntax and more details. </p>
 
 </body>
 
