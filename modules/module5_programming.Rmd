@@ -37,12 +37,8 @@ for (yrIdx in seq_along(years)) {
      # n.b., seq_along(x) is better than 1:length(x), since it handles the case
      # where the length of an object is 0 or NULL more robustly.
      sub <- subset(gap, gap$year == years[yrIdx])
-     if (sum(!is.na(sub$lifeExp)) && length(sub$lifeExp) > 1) {
      # fit regression
-       out[[yrIdx]] <- lm(lifeExp ~ log(gdpPercap), data = sub)
-     } else {
-       out[[yrIdx]] <- NA
-     }
+     out[[yrIdx]] <- lm(lifeExp ~ log(gdpPercap), data = sub)
 }
 out[['2007']]
 summary(out[['2007']])
@@ -60,18 +56,14 @@ for (yr in years) {
 # While loop
 
 It's not a particularly interesting example, but we can see the `while` loop
-syntax in the same example.
+syntax in the same example. In this case 
 
 ```{r, while}
-i <- 1
+yrIdx <- 1
 while (yrIdx <= length(years)) {
-     sub <- subset(gap, gap$year == years[i])
-     if (sum(!is.na(sub$lifeExp)) && length(sub$lifeExp) > 1) {
+     sub <- subset(gap, gap$year == years[yrIdx])
      # fit regression
-       out[[yrIdx]] <- lm(lifeExp ~ log(gdpPercap), data = sub)
-     } else {
-       out[[yrIdx]] <- NA
-     }
+     out[[yrIdx]] <- lm(lifeExp ~ log(gdpPercap), data = sub)
      yrIdx = yrIdx + 1
 }
 summary(out[['2007']])
