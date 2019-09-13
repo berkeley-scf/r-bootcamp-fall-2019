@@ -652,3 +652,13 @@ These questions ask you to work with the gapminder dataset.
 6) Using the data for 2007, recreate as much as you can of [this famous Gapminder plot](https://s3-eu-west-1.amazonaws.com/static.gapminder.org/GapminderMedia/wp-uploads/20161019161829/screenshot2016.jpg), where the colors are different continents. (Don't worry about the '2015' in the background and ignore the 'play' button at the bottom.)
 
 7) Create a "trellis" plot where, for a given year, each panel uses a) hollow circles to plot lifeExp as a function of log(gdpPercap), and b) a red loess smoother without standard errors to plot the trend. Turn off the grey background. Figure out how to use partially-transparent points to reduce the effect of the overplotting of points.
+
+8) In the following code, I try to plot the life expectancy over time, one line per country but where the color is by continent (in the module, we saw how to have the color vary by country).
+
+```{r, fig.cap="", eval=FALSE}
+ggplot(data = gap, aes(x = year, y = lifeExp)) +
+            geom_line(aes(color = continent))
+```
+
+This doesn't work. See if you can understand why and how to fix it. Hint, look up `group` in the ggplot2 help information in R.
+

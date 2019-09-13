@@ -548,6 +548,18 @@ gap %>% filter(year == 2007) %>% arrange(desc(pop)) %>%
 ## 7 ##
 
 ggplot(data = gap, aes(x = gdpPercap, y = lifeExp)) + geom_point(alpha = 0.3) + geom_smooth(method = "loess", color = 'red', se = FALSE)  + scale_x_log10(limits = c(100, 50000)) + facet_wrap(~year, nrow = 3) + theme_bw()
+
+## 8 ##
+
+ggplot(data = gap, aes(x = year, y = lifeExp)) +
+            geom_line(aes(color = continent))
+            
+## The problem here is that ggplot doesn't know that it should plot one line per country, because it tries to group the data by continent.
+
+## We can use the 'group' argument inside 'aes' to deal with this.
+ggplot(data = gap, aes(x = year, y = lifeExp)) +
+            geom_line(aes(color = continent, group = country))
+
+## Now that's a pretty informative plot! (Despite all the over-plotting...)
+
 ```
-
-
