@@ -371,6 +371,7 @@ dim(rta)
 # Not so fast...
 unlist(lapply(rta, class))[1:5]
 # ?read.table
+# stringsAsFactors=FALSE is the default as of R 4.0
 rta2 <- read.table("../data/RTAData.csv", sep = ",", 
   head = TRUE, stringsAsFactors = FALSE)
 rta2[3,3]

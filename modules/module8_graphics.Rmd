@@ -12,6 +12,7 @@ library(tidyr)
 library(ggplot2)
 library(gridExtra)
 library(reshape2)
+library(patchwork)
 if(!('modules' %in% unlist(strsplit(getwd(), split = '/')))) setwd('modules')
 gap <- read.csv(file.path('..', 'data', 'gapminder-FiveYearData.csv'), stringsAsFactors = FALSE)
 ```
@@ -568,8 +569,6 @@ grid.arrange(plot1, plot2, plot3, nrow=3, ncol = 1)
   arrangements to be built nearly effortlessly.
 
 ```{r, warning=FALSE, fig.cap=" ", fig.width=12}
-# Install and initialize patchwork library
-# devtools::install_github("thomasp85/patchwork")
 library(patchwork)
 
 # use the patchwork operators

@@ -74,7 +74,8 @@ If you're starting to type something you've typed before, or the long name of an
     * up/down arrows
     * Ctrl-{up arrow} or Command-{up arrow}
 - RStudio: select a line or block for execution
-- For keyboard shortcuts in RStudio see `Tools -> Keyboard Shortcuts Help`.
+- For keyboard shortcuts in RStudio see `Tools -> Keyboard Shortcuts Help` or [this online tip page](https://www.r-bloggers.com/rstudio-shortcuts-and-tips).
+- [Other tips](https://www.r-bloggers.com/tips-and-tricks-in-rstudio-and-r-markdown) for saving time in RStudio and R Markdown
 - Put your code in a file and use `source()`. For example: `source('myRcodeFile.R')`
 
 
